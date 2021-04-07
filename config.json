@@ -10,7 +10,7 @@
   "frontEndURL": "",
   "backEndURL": "https://fathomless-ravine-77137.herokuapp.com/",
   "pstn": false,
-  "precall": true,
+  "precall": false,
   "watermark": false,
   "chat": true,
   "cloudRecording": false,
