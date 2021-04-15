@@ -5,6 +5,7 @@ import ChatContext, {controlMessageEnum} from './ChatContext';
 import RtcContext from '../../agora-rn-uikit/src/RtcContext';
 import {messageStoreInterface} from './ChatContext';
 import {Platform} from 'react-native';
+import {backOff} from 'exponential-backoff';
 
 enum mType {
   Control = '0',
@@ -58,21 +59,46 @@ const RtmConfigure = (props: any) => {
       // console.log(evt);
     });
     engine.current.on('channelMemberJoined', (data: any) => {
-      engine.current.getUserAttributesByUid(data.uid).then((attr: any) => {
-        console.log('[user attributes]:', {attr});
-        let arr = new Int32Array(1);
-        arr[0] = parseInt(data.uid);
-        setUserList((prevState) => {
-          return {
-            ...prevState,
-            [Platform.OS === 'android' ? arr[0] : data.uid]: {
-              name: attr?.attributes?.name || 'User',
-            },
-          };
-        });
-      });
+      const backoffAttributes = backOff(
+        async () => {
+          const attr = await engine.current.getUserAttributesByUid(data.uid);
+          if (attr && attr.attributes && attr.attributes.name) {
+            return attr;
+          } else {
+            throw attr;
+          }
+        },
+        {
+          retry: (e, idx) => {
+            console.log(
+              `[retrying] Attempt ${idx}. Fetching ${data.uid}'s name`,
+              e,
+            );
+            return true;
+          },
+        },
+      );
+      async function getname() {
+        try {
+          const attr = await backoffAttributes;
+          console.log('[user attributes]:', {attr});
+          let arr = new Int32Array(1);
+          arr[0] = parseInt(data.uid);
+          setUserList((prevState) => {
+            return {
+              ...prevState,
+              [Platform.OS === 'android' ? arr[0] : data.uid]: {
+                name: attr?.attributes?.name || 'User',
+              },
+            };
+          });
+        } catch (e) {
+          console.error(`Could not retrieve name of ${data.uid}`, e);
+        }
+      }
+      getname();
     });
-    engine.current.on('channelMemberLeft', (data:any) => {
+    engine.current.on('channelMemberLeft', (data: any) => {
       let arr = new Int32Array(1);
       arr[0] = parseInt(data.uid);
       setUserList((prevState) => {
@@ -177,17 +203,43 @@ const RtmConfigure = (props: any) => {
       .getChannelMembersBychannelId(rtcProps.channel)
       .then((data) => {
         data.members.map(async (member: any) => {
-          let attr = await engine.current.getUserAttributesByUid(member.uid);
-          let arr = new Int32Array(1);
-          arr[0] = parseInt(member.uid);
-          setUserList((prevState) => {
-            return {
-              ...prevState,
-              [Platform.OS === 'android' ? arr[0] : member.uid]: {
-                name: attr?.attributes?.name || 'User',
+          const backoffAttributes = backOff(
+            async () => {
+              const attr = await engine.current.getUserAttributesByUid(
+                member.uid,
+              );
+              if (attr && attr.attributes && attr.attributes.name) {
+                return attr;
+              } else {
+                throw attr;
+              }
+            },
+            {
+              retry: (e, idx) => {
+                console.log(
+                  `[retrying] Attempt ${idx}. Fetching ${member.uid}'s name`,
+                  e,
+                );
+                return true;
               },
-            };
-          });
+            },
+          );
+          try {
+            const attr = await backoffAttributes;
+            console.log('[user attributes]:', {attr});
+            let arr = new Int32Array(1);
+            arr[0] = parseInt(data.uid);
+            setUserList((prevState) => {
+              return {
+                ...prevState,
+                [Platform.OS === 'android' ? arr[0] : member.uid]: {
+                  name: attr?.attributes?.name || 'User',
+                },
+              };
+            });
+          } catch (e) {
+            console.error(`Could not retrieve name of ${member.uid}`, e);
+          }
         });
         setLogin(true);
       });
