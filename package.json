@@ -4,7 +4,8 @@
   "scripts": {
     "start": "app-builder-init",
     "start:info": "app-builder-init --info",
-    "ci": "npm i && npm run start:info && cd conferencing && npm run web:build && mv ../vercel.json ./dist/"
+    "uikit": "git clone https://github.com/AgoraIO-Community/ReactNative-UIKit conferencing/agora-rn-uikit && cd conferencing/agora-rn-uikit && git checkout app-builder",
+    "ci": "npm run uikit && cd conferencing && npm i && npm run web:build && cp ../vercel.json ./dist/"
   },
   "keywords": [],
   "license": "MIT",
