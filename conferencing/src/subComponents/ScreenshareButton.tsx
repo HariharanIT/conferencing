@@ -1,19 +1,37 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {Image, TouchableOpacity, StyleSheet} from 'react-native';
 import icons from '../assets/icons';
 import RtcContext from '../../agora-rn-uikit/src/RtcContext';
 import PropsContext from '../../agora-rn-uikit/src/PropsContext';
 import ColorContext from '../components/ColorContext';
 
-const ScreenshareButton = (props: any) => {
+interface ScreenSharingProps {
+  screenshareActive: boolean;
+  setScreenshareActive: React.Dispatch<React.SetStateAction<boolean>>;
+}
+/**
+ * A component to start and stop screen sharing on web clients.
+ * Screen sharing is not yet implemented on mobile platforms.
+ * Electron has it's own screen sharing component
+ */
+const ScreenshareButton = (props: ScreenSharingProps) => {
   const {primaryColor} = useContext(ColorContext);
   const rtc = useContext(RtcContext);
   const {screenshareActive, setScreenshareActive} = props;
-  const {channel, appId, screenShareUid, screenShareToken, encryption} = useContext(PropsContext).rtcProps;
+  const {
+    channel,
+    appId,
+    screenShareUid,
+    screenShareToken,
+    encryption,
+  } = useContext(PropsContext).rtcProps;
 
-  rtc.RtcEngine.addListener('ScreenshareStopped', () => {
-    setScreenshareActive(false);
-  });
+  useEffect(() => {
+    rtc.RtcEngine.addListener('ScreenshareStopped', () => {
+      setScreenshareActive(false);
+    });
+  }, []);
+
   return (
     <TouchableOpacity
       style={
@@ -21,17 +39,21 @@ const ScreenshareButton = (props: any) => {
           ? style.greenLocalButton
           : [style.localButton, {borderColor: primaryColor}]
       }
-      onPress={() => {
-        setScreenshareActive(true);
-        rtc.RtcEngine.startScreenshare(
-          screenShareToken,
-          channel,
-          null,
-          screenShareUid,
-          appId,
-          rtc.RtcEngine,
-          encryption,
-        );
+      onPress={async () => {
+        try {
+          await rtc.RtcEngine.startScreenshare(
+            screenShareToken,
+            channel,
+            null,
+            screenShareUid,
+            appId,
+            rtc.RtcEngine,
+            encryption,
+          );
+          setScreenshareActive(true);
+        } catch (e) {
+          console.error("can't start the screen share", e);
+        }
       }}>
       <Image
         source={{
@@ -51,7 +73,6 @@ const style = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 2,
     borderColor: '#099DFD',
-    // borderWidth: 1,
     width: 46,
     height: 46,
     display: 'flex',
