@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "start": "app-builder-init",
-    "start:info": "app-builder-init --info"
+    "start:info": "app-builder-init --info",
+    "ci": "npm i && npm run start:info && cd conferencing && npm run web:build && mv ../vercel.json ./dist/"
   },
   "keywords": [],
   "license": "MIT",
