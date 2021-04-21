@@ -7,7 +7,7 @@
   "precall": true,
   "watermark": false,
   "chat": true,
-  "cloudRecording": false,
+  "cloudRecording": true,
   "screenSharing": true,
   "platformIos": false,
   "platformAndroid": false,
