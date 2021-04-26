@@ -1,9 +1,11 @@
-import React, {useMemo, useContext, useState} from 'react';
+import React, {useMemo, useContext, useState, useEffect} from 'react';
 import {View, Platform, StyleSheet, Text, Dimensions} from 'react-native';
 import MinUidContext from '../../agora-rn-uikit/src/MinUidContext';
 import MaxUidContext from '../../agora-rn-uikit/src/MaxUidContext';
 import {MaxVideoView} from '../../agora-rn-uikit/Components';
 import chatContext from '../components/ChatContext';
+import RtcContext, {DispatchType} from '../../agora-rn-uikit/src/RtcContext';
+import {DualStreamMode} from '../../agora-rn-uikit/src/PropsContext';
 
 const layout = (len: number, isDesktop: boolean = true) => {
   const rows = Math.round(Math.sqrt(len));
@@ -30,6 +32,7 @@ const GridVideo = () => {
   const min = useContext(MinUidContext);
   const {userList, localUid} = useContext(chatContext);
   const users = [...max, ...min];
+  const {dispatch} = useContext(RtcContext);
   let onLayout = (e: any) => {
     setDim([e.nativeEvent.layout.width, e.nativeEvent.layout.height]);
   };
@@ -43,6 +46,20 @@ const GridVideo = () => {
     users.length,
     isDesktop,
   ]);
+  useEffect(() => {
+    console.log(`[GridVideo]: ${users.length} users`);
+    if (users.length > 5) {
+      (dispatch as DispatchType<'UpdateDualStreamMode'>)({
+        type: 'UpdateDualStreamMode',
+        value: [DualStreamMode.LOW],
+      });
+    } else {
+      (dispatch as DispatchType<'UpdateDualStreamMode'>)({
+        type: 'UpdateDualStreamMode',
+        value: [DualStreamMode.HIGH],
+      });
+    }
+  }, [users.length]);
   return (
     <View style={style.full} onLayout={onLayout}>
       {matrix.map((r, ridx) => (
@@ -68,16 +85,23 @@ const GridVideo = () => {
                     height: 25,
                     // alignItems: 'flex-start',
                   }}>
-                  <Text textBreakStrategy={'simple'}
-                    style={{color: '#333', lineHeight: 25, fontWeight: '700',width: '100%',alignSelf: 'stretch',
-                    textAlign: 'center',}}>
+                  <Text
+                    textBreakStrategy={'simple'}
+                    style={{
+                      color: '#333',
+                      lineHeight: 25,
+                      fontWeight: '700',
+                      width: '100%',
+                      alignSelf: 'stretch',
+                      textAlign: 'center',
+                    }}>
                     {users[ridx * dims.c + cidx].uid === 'local'
                       ? userList[localUid]
                         ? userList[localUid].name + ' '
-                        : "You "
+                        : 'You '
                       : userList[users[ridx * dims.c + cidx].uid]
                       ? userList[users[ridx * dims.c + cidx].uid].name + ' '
-                      : "User "}
+                      : 'User '}
                   </Text>
                   {/* {console.log(
                     '!nax',
@@ -111,5 +135,5 @@ const style = StyleSheet.create({
     flex: 1,
     margin: 1,
   },
-})
+});
 export default GridVideo;
