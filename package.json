@@ -4,7 +4,7 @@
   "scripts": {
     "start": "app-builder-init",
     "start:info": "app-builder-init --info",
-    "uikit": "git clone https://github.com/AgoraIO-Community/ReactNative-UIKit conferencing/agora-rn-uikit && cd conferencing/agora-rn-uikit && git checkout app-builder",
+    "uikit": "git clone https://github.com/AgoraIO-Community/ReactNative-UIKit conferencing/agora-rn-uikit && cd conferencing/agora-rn-uikit && git checkout app-builder-dev",
     "ci": "npm run uikit && cd conferencing && npm i && npm run web:build && cp ../vercel.json ./dist/"
   },
   "keywords": [],
