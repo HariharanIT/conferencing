@@ -140,7 +140,10 @@ export default class RtcEngine {
                 console.log('triggered');
                 this.removeStream(evt);
             });
-            // this.client.on('stream-fallback',)
+            // this.client.on('stream-fallback', (evt))
+            this.client.on('stream-type-changed', function(evt) {
+                console.log('[fallback]: ', evt.uid, evt.streamType);
+            });
             this.client.on('stream-published', (evt) => {
                 (this.eventsMap.get('JoinChannelSuccess') as callbackType)();
             });
