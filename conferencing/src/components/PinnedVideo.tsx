@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import {
   ScrollView,
   TouchableOpacity,
@@ -9,10 +9,11 @@ import {
   Text,
 } from 'react-native';
 import {MinUidConsumer} from '../../agora-rn-uikit/src/MinUidContext';
-import RtcContext from '../../agora-rn-uikit/src/RtcContext';
 import {MaxVideoView} from '../../agora-rn-uikit/Components';
 import {MaxUidConsumer} from '../../agora-rn-uikit/src/MaxUidContext';
 import chatContext from '../components/ChatContext';
+import RtcContext, {DispatchType} from '../../agora-rn-uikit/src/RtcContext';
+import {DualStreamMode} from '../../agora-rn-uikit/src/PropsContext';
 
 const PinnedVideo = () => {
   const [dim, setDim] = useState([
@@ -28,6 +29,14 @@ const PinnedVideo = () => {
     }, 20);
   };
   const {userList, localUid} = useContext(chatContext);
+  const {dispatch} = useContext(RtcContext);
+
+  useEffect(() => {
+    (dispatch as DispatchType<'UpdateDualStreamMode'>)({
+      type: 'UpdateDualStreamMode',
+      value: [DualStreamMode.DYNAMIC],
+    });
+  }, []);
   return (
     <View
       style={{flexDirection: dim[2] ? 'row' : 'column', flex: 1}}
@@ -52,6 +61,8 @@ const PinnedVideo = () => {
                       : 'You '
                     : userList[maxUsers[0].uid]
                     ? userList[maxUsers[0].uid].name + ' '
+                    : maxUsers[0].uid === 1
+                    ? userList[localUid].name + "'s screenshare "
                     : 'User '}
                 </Text>
               </View>
@@ -110,6 +121,8 @@ const PinnedVideo = () => {
                               : 'You '
                             : userList[user.uid]
                             ? userList[user.uid].name + ' '
+                            : user.uid === 1
+                            ? userList[localUid].name + "'s screenshare "
                             : 'User '}
                         </Text>
                       </View>
@@ -138,7 +151,6 @@ const style = StyleSheet.create({
     height: 25,
   },
   name: {color: '#333', lineHeight: 25, fontWeight: '700'},
-
 });
 
 export default PinnedVideo;

@@ -14,30 +14,25 @@ const ChatInput = (props: any) => {
   const [message, onChangeMessage] = useState('');
   const {privateActive, selectedUser} = props;
   const {sendMessage, sendMessageToUid} = useContext(ChatContext);
+  function send() {
+    if (message !== '') {
+      !privateActive
+        ? (sendMessage(message), onChangeMessage(''))
+        : (sendMessageToUid(message, selectedUser.uid), onChangeMessage(''));
+    }
+  }
   return (
     <View style={[style.inputView, {borderColor: primaryColor}]}>
       <TextInput
         style={style.chatInput}
         value={message}
         onChangeText={(text) => onChangeMessage(text)}
-        onSubmitEditing={() => {
-          !privateActive
-            ? (sendMessage(message), onChangeMessage(''))
-            : (sendMessageToUid(message, selectedUser.uid),
-              onChangeMessage(''));
-        }}
+        onSubmitEditing={send}
         placeholder="Type your message.."
         placeholderTextColor="#000"
         autoCorrect={false}
       />
-      <TouchableOpacity
-        style={style.chatInputButton}
-        onPress={() => {
-          !privateActive
-            ? (sendMessage(message), onChangeMessage(''))
-            : (sendMessageToUid(message, selectedUser.uid),
-              onChangeMessage(''));
-        }}>
+      <TouchableOpacity style={style.chatInputButton} onPress={send}>
         <Text style={style.chatInputButtonText}>
           {!privateActive ? 'G' : 'P'}
         </Text>

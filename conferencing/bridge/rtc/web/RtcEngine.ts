@@ -30,6 +30,10 @@ declare global {
     }
 }
 
+export enum VideoStreamType{
+    'HIGH',
+    'LOW'
+}
 
 export default class RtcEngine {
     public appId: string;
@@ -64,11 +68,11 @@ export default class RtcEngine {
         // this.AgoraRTC = AgoraRTC;
         this.client = AgoraRTC.createClient({
             codec: 'vp8',
-            mode: 'live',
+            mode: 'rtc',
         });
         this.screenClient = AgoraRTC.createClient({
             codec: 'vp8',
-            mode: 'live',
+            mode: 'rtc',
         });
         this.streamSpec = {
             video: true,
@@ -116,7 +120,7 @@ export default class RtcEngine {
 
     async joinChannel(token: string, channelName: string, optionalInfo: string, optionalUid: number): Promise<void> {
         let self = this;
-        let join = new Promise((resolve, reject) => {
+        let join = new Promise<void>((resolve, reject) => {
             this.client.on('stream-added', (evt) => {
                 this.inScreenshare ?
                     evt.stream.getId() !== this.streams.get(1).getId() ?
@@ -135,6 +139,10 @@ export default class RtcEngine {
             this.client.on('peer-leave', (evt) => {
                 console.log('triggered');
                 this.removeStream(evt);
+            });
+            // this.client.on('stream-fallback', (evt))
+            this.client.on('stream-type-changed', function(evt) {
+                console.log('[fallback]: ', evt.uid, evt.streamType);
             });
             this.client.on('stream-published', (evt) => {
                 (this.eventsMap.get('JoinChannelSuccess') as callbackType)();
@@ -236,8 +244,14 @@ export default class RtcEngine {
 
     async enableDualStreamMode(option: boolean) {
         option ? this.client.enableDualStream(
-            () => Promise.resolve(null),
-            () => Promise.reject('error in enable dual stream'))
+            () => {
+                console.log('[bridge]: dual stream is enabled');
+                Promise.resolve(null);
+            },
+            (e) => {
+                console.log('[bridge]: dual stream not enabled', e);
+                Promise.reject('error in enable dual stream');
+            })
         : this.client.disableDualStream(
             () => Promise.resolve(null),
             () => Promise.reject('error in disable dual stream'));
@@ -276,6 +290,11 @@ export default class RtcEngine {
             this.streams.clear();
         }
     }
+
+    async setRemoteVideoStreamType(uid: number, streamType: VideoStreamType): Promise<void> {
+        this.client.setRemoteVideoStreamType(this.streams.get(uid) as AgoraRTC.Stream,streamType);
+    }
+
     async startScreenshare(token: string, channelName: string, optionalInfo: string, optionalUid: number, appId: string, engine: AgoraRTC, encryption: {screenKey: string; mode: 'aes-128-xts' | 'aes-256-xts' | 'aes-128-ecb'}): Promise<void> {
         if (!this.inScreenshare) {
             let init = new Promise(((resolve, reject) => {
