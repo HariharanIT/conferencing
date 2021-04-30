@@ -22,6 +22,7 @@ import {useParams} from './Router';
 import {gql, useQuery} from '@apollo/client';
 import icons from '../assets/icons';
 import platform from '../subComponents/Platform';
+import {UserType} from './RTMConfigure'
 
 const SHARE = gql`
   query share($passphrase: String!) {
@@ -101,28 +102,7 @@ PSTN Pin: ${data.share.pstn.dtmf}`)
           <MaxUidConsumer>
             {(maxUser) =>
               [...minUsers, ...maxUser].map((user) =>
-                user.uid !== 'local' ? (
-                  <View style={style.participantContainer} key={user.uid}>
-                    <Text style={style.participantText}>
-                      {userList[user.uid]
-                        ? userList[user.uid].name + ' '
-                        : 'User '}
-                    </Text>
-                    <View style={style.participantButtonContainer}>
-                      <RemoteAudioMute
-                        uid={user.uid}
-                        audio={user.audio}
-                        isHost={props.isHost}
-                      />
-                      <RemoteVideoMute
-                        uid={user.uid}
-                        video={user.video}
-                        isHost={props.isHost}
-                      />
-                      <RemoteEndCall uid={user.uid} isHost={props.isHost} />
-                    </View>
-                  </View>
-                ) : (
+                user.uid === 'local' ? (
                   <View style={style.participantContainer} key={user.uid}>
                     <Text style={style.participantText}>
                       {userList[localUid]
@@ -135,6 +115,39 @@ PSTN Pin: ${data.share.pstn.dtmf}`)
                         <LocalVideoMute />
                       </LocalUserContext>
                     </View>
+                  </View>
+                ) : user.uid === 1 ? (
+                  <View style={style.participantContainer} key={user.uid}>
+                    <Text style={style.participantText}>
+                      {userList[localUid]
+                        ? userList[localUid].name + "'s screenshare "
+                        : 'Your screenshare '}
+                    </Text>
+                  </View>
+                ) : (
+                  <View style={style.participantContainer} key={user.uid}>
+                    <Text style={style.participantText}>
+                      {userList[user.uid]
+                        ? userList[user.uid].name + ' '
+                        : 'User '}
+                    </Text>
+                    {userList[user.uid].type !== UserType.ScreenShare ? (
+                      <View style={style.participantButtonContainer}>
+                        <RemoteAudioMute
+                          uid={user.uid}
+                          audio={user.audio}
+                          isHost={props.isHost}
+                        />
+                        <RemoteVideoMute
+                          uid={user.uid}
+                          video={user.video}
+                          isHost={props.isHost}
+                        />
+                        <RemoteEndCall uid={user.uid} isHost={props.isHost} />
+                      </View>
+                    ) : (
+                      <></>
+                    )}
                   </View>
                 ),
               )
