@@ -6,6 +6,7 @@ import {MaxVideoView} from '../../agora-rn-uikit/Components';
 import chatContext from '../components/ChatContext';
 import RtcContext, {DispatchType} from '../../agora-rn-uikit/src/RtcContext';
 import {DualStreamMode} from '../../agora-rn-uikit/src/PropsContext';
+import FallbackLogo from '../subComponents/FallbackLogo';
 
 const layout = (len: number, isDesktop: boolean = true) => {
   const rows = Math.round(Math.sqrt(len));
@@ -73,6 +74,7 @@ const GridVideo = () => {
               key={cidx}>
               <View style={style.gridVideoContainerInner}>
                 <MaxVideoView
+                  fallback={FallbackLogo}
                   user={users[ridx * dims.c + cidx]}
                   key={users[ridx * dims.c + cidx].uid}
                 />

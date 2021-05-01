@@ -14,6 +14,7 @@ import {MaxUidConsumer} from '../../agora-rn-uikit/src/MaxUidContext';
 import chatContext from '../components/ChatContext';
 import RtcContext, {DispatchType} from '../../agora-rn-uikit/src/RtcContext';
 import {DualStreamMode} from '../../agora-rn-uikit/src/PropsContext';
+import FallbackLogo from '../subComponents/FallbackLogo';
 
 const PinnedVideo = () => {
   const [dim, setDim] = useState([
@@ -52,7 +53,11 @@ const PinnedVideo = () => {
         <MaxUidConsumer>
           {(maxUsers) => (
             <View style={style.flex1}>
-              <MaxVideoView user={maxUsers[0]} key={maxUsers[0].uid} />
+              <MaxVideoView
+                fallback={FallbackLogo}
+                user={maxUsers[0]}
+                key={maxUsers[0].uid}
+              />
               <View style={style.nameHolder}>
                 <Text style={style.name}>
                   {maxUsers[0].uid === 'local'
@@ -109,9 +114,9 @@ const PinnedVideo = () => {
                     }}>
                     <View style={style.flex1}>
                       <MaxVideoView
+                        fallback={FallbackLogo}
                         user={user}
                         key={user.uid}
-                        showOverlay={false}
                       />
                       <View style={style.nameHolder}>
                         <Text style={style.name}>
