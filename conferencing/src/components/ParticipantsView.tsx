@@ -22,7 +22,7 @@ import {useParams} from './Router';
 import {gql, useQuery} from '@apollo/client';
 import icons from '../assets/icons';
 import platform from '../subComponents/Platform';
-import {UserType} from './RTMConfigure'
+import {UserType} from './RTMConfigure';
 
 const SHARE = gql`
   query share($passphrase: String!) {
@@ -51,31 +51,28 @@ const ParticipantView = (props: any) => {
   const copyToClipboard = () => {
     if (data && !loading) {
       let stringToCopy = '';
-      $config.frontEndURL
-        ? (stringToCopy +=
-            `Meeting - ${data.share.title}
-URL for Attendee: ${$config.frontEndURL}/${data.share.passphrase.view}` +
-            data.share.passphrase.host
-              ? `URL for Host: ${$config.frontEndURL}/${data.share.passphrase.host}`
-              : '')
-        : platform === 'web'
-        ? (stringToCopy +=
-            `Meeting - ${data.share.title}
-URL for Attendee: ${window.location.origin}/${data.share.passphrase.view}` +
-            data.share.passphrase.host
-              ? `URL for Host: ${$config.frontEndURL}/${data.share.passphrase.host}`
-              : '')
-        : (stringToCopy +=
-            `Meeting - ${data.share.title}
-Attendee Meeting ID: ${data.share.passphrase.view}` + data.share.passphrase.host
-              ? `Host Meeting ID: ${data.share.passphrase.host}`
-              : '');
-
-      data.share.pstn
-        ? (stringToCopy += `PSTN Number: ${data.share.pstn.number}
-PSTN Pin: ${data.share.pstn.dtmf}`)
-        : '';
-      console.log(stringToCopy);
+      if ($config.frontEndURL) {
+        stringToCopy += `Meeting - ${data.share.title}\nURL for Attendee: ${$config.frontEndURL}/${data.share.passphrase.view}`;
+        if (data.share.passphrase.host) {
+          stringToCopy += `\nURL for Host: ${$config.frontEndURL}/${data.share.passphrase.host}`;
+        }
+      } else {
+        if (platform === 'web') {
+          stringToCopy += `Meeting - ${data.share.title}\nURL for Attendee: ${window.location.origin}/${data.share.passphrase.view}`;
+          if (data.share.passphrase.host) {
+            stringToCopy += `\nURL for Host: ${window.location.origin}/${data.share.passphrase.host}`;
+          }
+        } else {
+          stringToCopy += `Meeting - ${data.share.title}\nAttendee Meeting ID: ${data.share.passphrase.view}`;
+          if (data.share.passphrase.host) {
+            stringToCopy += `\nHost Meeting ID: ${data.share.passphrase.host}`;
+          }
+        }
+      }
+      if (data.share.pstn) {
+        stringToCopy += `\nPSTN Number: ${data.share.pstn.number}\nPSTN Pin: ${data.share.pstn.dtmf}`;
+      }
+      console.log('Copying string to clipboard:', stringToCopy);
       Clipboard.setString(stringToCopy);
     }
   };
