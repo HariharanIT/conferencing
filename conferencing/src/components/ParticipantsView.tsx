@@ -72,7 +72,6 @@ const ParticipantView = (props: any) => {
       if (data.share.pstn) {
         stringToCopy += `\nPSTN Number: ${data.share.pstn.number}\nPSTN Pin: ${data.share.pstn.dtmf}`;
       }
-      console.log('Copying string to clipboard:', stringToCopy);
       Clipboard.setString(stringToCopy);
     }
   };
