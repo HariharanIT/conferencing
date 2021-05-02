@@ -12,6 +12,7 @@ import PropsContext from '../../agora-rn-uikit/src/PropsContext';
 import icons from '../assets/icons';
 import Settings from '../components/Settings';
 import ColorContext from '../components/ColorContext';
+import Layout from '../subComponents/LayoutEnum';
 
 const {
   participantIcon,
@@ -73,7 +74,9 @@ const Navbar = (props: any) => {
           />
           <MinUidConsumer>
             {(minUsers) => (
-              <Text style={[style.participantText, {color: primaryColor}]}>{minUsers.length + 1}</Text>
+              <Text style={[style.participantText, {color: primaryColor}]}>
+                {minUsers.length + 1}
+              </Text>
             )}
           </MinUidConsumer>
         </TouchableOpacity>
@@ -81,7 +84,9 @@ const Navbar = (props: any) => {
       <View style={style.layoutBtnHolder}>
         <TouchableOpacity
           onPress={() => {
-            setLayout(!layout);
+            setLayout((l: Layout) =>
+              l === Layout.Pinned ? Layout.Grid : Layout.Pinned,
+            );
           }}
           style={style.layoutBtn}>
           <Image
