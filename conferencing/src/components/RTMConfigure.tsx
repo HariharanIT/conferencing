@@ -113,10 +113,17 @@ const RtmConfigure = (props: any) => {
       let arr = new Int32Array(1);
       arr[0] = parseInt(data.uid);
       setUserList((prevState) => {
-        const uid: number = Platform.OS === 'android' ? arr[0] : data.uid;
-        const screenuid: number = prevState[uid].screenUid;
-        const {[uid]: _user, [screenuid]: _screen, ...newState} = prevState;
-        return newState;
+        try {
+          const uid: number = Platform.OS === 'android' ? arr[0] : data.uid;
+          const screenuid: number = prevState[uid]?.screenUid;
+          const {[uid]: _user, [screenuid]: _screen, ...newState} = prevState;
+          return newState;
+        } catch (e) {
+          console.error(
+            '[RTMConfigure]: channelMemeberLeft - setUserList: ',
+            e,
+          );
+        }
       });
     });
     engine.current.on('messageReceived', (evt: any) => {
