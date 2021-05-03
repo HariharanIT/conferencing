@@ -59,6 +59,7 @@
 		2F1D05D58E4BADDDA1CC33A8 /* Pods-conferencing-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-conferencing-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-conferencing-tvOSTests/Pods-conferencing-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		3E52DD93A5BAB1170B1B76B8 /* Pods-conferencing-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-conferencing-tvOS.release.xcconfig"; path = "Target Support Files/Pods-conferencing-tvOS/Pods-conferencing-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		44ABF2B988DE52ABA096D77D /* libPods-conferencing-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-conferencing-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		65C4D09626400F4900D32A75 /* conferencing.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = conferencing.entitlements; path = conferencing/conferencing.entitlements; sourceTree = "<group>"; };
 		65FD6B79263EB19D00E668E5 /* conferencing-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "conferencing-Bridging-Header.h"; sourceTree = "<group>"; };
 		65FD6B7A263EB19D00E668E5 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		7E795618D1F9C1A4481EF65C /* Pods-conferencing-conferencingTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-conferencing-conferencingTests.debug.xcconfig"; path = "Target Support Files/Pods-conferencing-conferencingTests/Pods-conferencing-conferencingTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -127,6 +128,7 @@
 		13B07FAE1A68108700A75B9A /* conferencing */ = {
 			isa = PBXGroup;
 			children = (
+				65C4D09626400F4900D32A75 /* conferencing.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -699,6 +701,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = conferencing/conferencing.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = U3A6Q69KRZ;
 				ENABLE_BITCODE = NO;
@@ -709,7 +712,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.conferencing;
 				PRODUCT_NAME = conferencing;
 				SWIFT_OBJC_BRIDGING_HEADER = "conferencing-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -724,6 +727,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = conferencing/conferencing.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = U3A6Q69KRZ;
 				INFOPLIST_FILE = conferencing/Info.plist;
@@ -733,7 +737,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = io.agora.conferencing;
 				PRODUCT_NAME = conferencing;
 				SWIFT_OBJC_BRIDGING_HEADER = "conferencing-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
