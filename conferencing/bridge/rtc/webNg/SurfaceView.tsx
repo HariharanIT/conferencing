@@ -1,6 +1,7 @@
+import {ILocalVideoTrack, IRemoteVideoTrack} from 'agora-rtc-sdk-ng';
 import React, {useEffect} from 'react';
 import {StyleProp, StyleSheet, ViewProps, ViewStyle} from 'react-native';
-import {VideoMirrorMode, VideoRenderMode} from 'react-native-agora/lib/Types';
+import {VideoMirrorMode, VideoRenderMode} from 'react-native-agora';
 
 export interface RtcSurfaceViewProps extends ViewProps {
   zOrderMediaOverlay?: boolean;
@@ -23,10 +24,17 @@ interface SurfaceViewInterface
 
 const SurfaceView = (props: SurfaceViewInterface) => {
   //   console.log('Surface View props', props);
-  const stream: AgoraRTC.Stream = window.engine.streams.get(props.uid);
+
+  const stream: ILocalVideoTrack | IRemoteVideoTrack =
+    props.uid === 0
+      ? window.engine.localStream.video
+      : props.uid === 1
+      ? window.engine.screenStream.video
+      : window.engine.remoteStreams.get(props.uid)?.video;
+  console.log(props, window.engine, stream);
   useEffect(
     function () {
-      if (stream) {
+      if (stream?.play) {
         if (props.renderMode === 2) {
           stream.play(String(props.uid), {fit: 'contain'});
         } else {
@@ -48,7 +56,7 @@ const SurfaceView = (props: SurfaceViewInterface) => {
       style={{...style.full, ...(props.style as Object)}}
     />
   ) : (
-    <></>
+    <div style={{...style.full, backgroundColor: 'black'}} />
   );
 };
 
