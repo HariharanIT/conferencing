@@ -26,29 +26,29 @@ const DeviceConfigure: React.FC = (props: any) => {
         }
       });
     }
-  });
+  }, []);
 
-  useEffect(() => {
-    if (selectedCam.length !== 0) {
-      rtc.RtcEngine.changeCamera(
-        selectedCam,
-        () => {},
-        (e: any) => console.log(e),
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCam]);
+  // useEffect(() => {
+  //   if (selectedCam.length !== 0) {
+  //     rtc.RtcEngine.changeCamera(
+  //       selectedCam,
+  //       () => {},
+  //       (e: any) => console.log(e),
+  //     );
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [selectedCam]);
 
-  useEffect(() => {
-    if (selectedCam.length !== 0) {
-      rtc.RtcEngine.changeMic(
-        selectedMic,
-        () => {},
-        (e: any) => console.log(e),
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedMic]);
+  // useEffect(() => {
+  //   if (selectedCam.length !== 0) {
+  //     rtc.RtcEngine.changeMic(
+  //       selectedMic,
+  //       () => {},
+  //       (e: any) => console.log(e),
+  //     );
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [selectedMic]);
 
   return (
     <DeviceContext.Provider
