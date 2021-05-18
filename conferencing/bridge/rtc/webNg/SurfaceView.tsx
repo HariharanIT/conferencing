@@ -31,7 +31,7 @@ const SurfaceView = (props: SurfaceViewInterface) => {
       : props.uid === 1
       ? window.engine.screenStream.video
       : window.engine.remoteStreams.get(props.uid)?.video;
-  console.log(props, window.engine, stream);
+  // console.log(props, window.engine, stream);
   useEffect(
     function () {
       if (stream?.play) {

@@ -151,8 +151,11 @@ export default class RtcEngine {
       let [
         localAudio,
         localVideo,
-      ] = await AgoraRTC.createMicrophoneAndCameraTracks({});
-      localVideo.setEncoderConfiguration(this.videoProfile);
+      ] = await AgoraRTC.createMicrophoneAndCameraTracks(
+        {},
+        {encoderConfig: this.videoProfile},
+      );
+      // localVideo.setEncoderConfiguration(this.videoProfile);
       this.localStream.audio = localAudio;
       this.localStream.video = localVideo;
     } catch (e) {
@@ -204,8 +207,19 @@ export default class RtcEngine {
           ? user.uid
           : 1
         : user.uid;
-
       (this.eventsMap.get('UserJoined') as callbackType)(uid);
+      (this.eventsMap.get('RemoteVideoStateChanged') as callbackType)(
+        uid,
+        0,
+        0,
+        0,
+      );
+      (this.eventsMap.get('RemoteAudioStateChanged') as callbackType)(
+        uid,
+        0,
+        0,
+        0,
+      );
     });
 
     this.client.on('user-left', (user) => {
@@ -351,10 +365,11 @@ export default class RtcEngine {
 
   async leaveChannel(): Promise<void> {
     this.client.leave();
-    this.streams.forEach((stream, uid, map) => {
-      stream.close();
+    this.remoteStreams.forEach((stream, uid, map) => {
+      stream.video?.close();
+      stream.audio?.close();
     });
-    this.streams.clear();
+    this.remoteStreams.clear();
   }
 
   addListener<EventType extends keyof RtcEngineEvents>(
@@ -419,7 +434,7 @@ export default class RtcEngine {
   }
 
   async getDevices(
-    callback: (devices: any) => void,
+    callback: (devices: Array<MediaDeviceInfo>) => void,
   ): Promise<Array<MediaDeviceInfo>> {
     const devices: Array<MediaDeviceInfo> = await AgoraRTC.getDevices(true);
     callback && callback(devices);
@@ -429,7 +444,7 @@ export default class RtcEngine {
   async changeCamera(cameraId, callback, error): Promise<void> {
     try {
       await this.localStream.video?.setDevice(cameraId);
-      callback();
+      callback(cameraId);
     } catch (e) {
       error(e);
     }
@@ -437,8 +452,8 @@ export default class RtcEngine {
 
   async changeMic(micId, callback, error) {
     try {
-      await this.localStream.video?.setDevice(micId);
-      callback();
+      await this.localStream.audio?.setDevice(micId);
+      callback(micId);
     } catch (e) {
       error(e);
     }
