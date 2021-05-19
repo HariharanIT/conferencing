@@ -12,6 +12,7 @@ import AgoraRTC, {
   ClientConfig,
   ICameraVideoTrack,
   EncryptionMode,
+  ILocalTrack,
 } from 'agora-rtc-sdk-ng';
 import {EncryptionConfig} from 'react-native-agora';
 import type {
@@ -99,6 +100,11 @@ export default class RtcEngine {
 
   // };
   private videoProfile: VideoProfile = '480p_9';
+  private isPublished = false;
+  private isAudioEnabled = true;
+  private isVideoEnabled = true;
+  private isAudioPublished = false;
+  private isVideoPublished = false;
 
   constructor(appId: string) {
     this.appId = appId;
@@ -171,6 +177,39 @@ export default class RtcEngine {
     //   }, reject);
     // });
     // await enable;
+  }
+  async publish() {
+    if (this.localStream.audio && this.localStream.video) {
+      try {
+        let tracks: Array<ILocalTrack> = [];
+        this.isAudioEnabled && tracks.push(this.localStream.audio);
+        this.isVideoEnabled && tracks.push(this.localStream.video);
+
+        if (tracks.length > 0) {
+          console.log('publishing now');
+          await this.client.publish(tracks);
+          if (tracks[0].trackMediaType === 'audio') {
+            this.isAudioPublished = true;
+          } else if (tracks[0].trackMediaType === 'video') {
+            this.isVideoPublished = true;
+          }
+
+          if (tracks[1]?.trackMediaType === 'audio') {
+            this.isAudioPublished = true;
+          } else if (tracks[1]?.trackMediaType === 'video') {
+            this.isVideoPublished = true;
+          }
+
+          if (this.isPublished === false) {
+            this.isPublished = true;
+            (this.eventsMap.get('JoinChannelSuccess') as callbackType)();
+          }
+        }
+      } catch (e) {
+        console.error(e, this.localStream);
+        this.isPublished = false;
+      }
+    }
   }
 
   async joinChannel(
@@ -354,13 +393,7 @@ export default class RtcEngine {
       token || null,
       optionalUid || null,
     );
-    if (this.localStream.audio && this.localStream.video) {
-      await this.client.publish([
-        this.localStream.audio,
-        this.localStream.video,
-      ]);
-      (this.eventsMap.get('JoinChannelSuccess') as callbackType)();
-    }
+    await this.publish();
   }
 
   async leaveChannel(): Promise<void> {
@@ -398,6 +431,10 @@ export default class RtcEngine {
   async muteLocalAudioStream(muted: boolean): Promise<void> {
     try {
       await this.localStream.audio?.setEnabled(!muted);
+      this.isAudioEnabled = !muted;
+      if (!muted && !this.isAudioPublished) {
+        await this.publish();
+      }
     } catch (e) {
       console.error(
         e,
@@ -409,6 +446,10 @@ export default class RtcEngine {
   async muteLocalVideoStream(muted: boolean): Promise<void> {
     try {
       await this.localStream.video?.setEnabled(!muted);
+      this.isVideoEnabled = !muted;
+      if (!muted && !this.isVideoPublished) {
+        await this.publish();
+      }
     } catch (e) {
       console.error(
         e,
@@ -489,7 +530,9 @@ export default class RtcEngine {
 
   async enableEncryption(
     enabled: boolean,
-    config: EncryptionConfig,
+    config: {
+      encryptionMode: RnEncryptionEnum;
+    },
   ): Promise<void> {
     let mode: EncryptionMode;
     if (enabled) {
