@@ -125,7 +125,7 @@ const GridVideo = (props: GridVideoProps) => {
                       : userList[users[ridx * dims.c + cidx].uid]
                       ? userList[users[ridx * dims.c + cidx].uid].name + ' '
                       : users[ridx * dims.c + cidx].uid === 1
-                      ? userList[localUid].name + "'s screenshare "
+                      ? userList[localUid]?.name + "'s screenshare "
                       : 'User '}
                   </Text>
                   {/* {console.log(

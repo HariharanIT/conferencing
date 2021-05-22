@@ -430,7 +430,12 @@ export default class RtcEngine {
 
   async muteLocalAudioStream(muted: boolean): Promise<void> {
     try {
-      await this.localStream.audio?.setEnabled(!muted);
+      // await this.localStream.audio?.setEnabled(!muted);
+      // this.isAudioEnabled = !muted;
+      if (muted) {
+        await this.client.unpublish(this.localStream.audio);
+        this.isAudioPublished = false;
+      }
       this.isAudioEnabled = !muted;
       if (!muted && !this.isAudioPublished) {
         await this.publish();
