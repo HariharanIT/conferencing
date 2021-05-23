@@ -32,7 +32,6 @@ declare global {
     engine: RtcEngine;
   }
 }
-
 export declare enum RnEncryptionEnum {
   /**
    * @deprecated
@@ -78,6 +77,7 @@ interface RemoteStream {
 }
 
 export default class RtcEngine {
+  public AgoraRTC = AgoraRTC;
   public appId: string;
   // public AgoraRTC: any;
   public client: IAgoraRTCClient;
@@ -430,7 +430,12 @@ export default class RtcEngine {
 
   async muteLocalAudioStream(muted: boolean): Promise<void> {
     try {
-      await this.localStream.audio?.setEnabled(!muted);
+      // await this.localStream.audio?.setEnabled(!muted);
+      // this.isAudioEnabled = !muted;
+      if (muted) {
+        await this.client.unpublish(this.localStream.audio);
+        this.isAudioPublished = false;
+      }
       this.isAudioEnabled = !muted;
       if (!muted && !this.isAudioPublished) {
         await this.publish();
@@ -477,14 +482,20 @@ export default class RtcEngine {
   async getDevices(
     callback: (devices: Array<MediaDeviceInfo>) => void,
   ): Promise<Array<MediaDeviceInfo>> {
-    const devices: Array<MediaDeviceInfo> = await AgoraRTC.getDevices(true);
+    const devices: Array<MediaDeviceInfo> = await AgoraRTC.getDevices();
     callback && callback(devices);
     return devices;
   }
 
   async changeCamera(cameraId, callback, error): Promise<void> {
     try {
-      await this.localStream.video?.setDevice(cameraId);
+      if (navigator.userAgent.includes('Android')) {
+        this.localStream.video?.stop();
+        await this.localStream.video?.setDevice(cameraId);
+        this.localStream.video?.play(0, {fit: 'contain'});
+      } else {
+        await this.localStream.video?.setDevice(cameraId);
+      }
       callback(cameraId);
     } catch (e) {
       error(e);
