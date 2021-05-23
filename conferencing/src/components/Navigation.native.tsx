@@ -20,7 +20,10 @@ const Navigation = () => {
     };
     const deepLink = async () => {
       const initialUrl = await Linking.getInitialURL();
-      Linking.addEventListener('url', (e) => deepLinkUrl(e.url));
+      Linking.addEventListener('url', (e) => {
+        console.log('URL opened', e);
+        deepLinkUrl(e.url)
+      });
       deepLinkUrl(initialUrl);
     };
     deepLink();
