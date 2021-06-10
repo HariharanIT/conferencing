@@ -1,0 +1,13 @@
+{
+  "name": "agora-app-builder",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "agora-app-builder-cli",
+    "ci": "agora-app-builder-cli install --info && agora-app-builder-cli build web --prod && cp ./vercel.json ./conferencing/dist && cp ./apple-app-site-association ./conferencing/dist"
+  },
+  "keywords": [],
+  "license": "MIT",
+  "dependencies": {
+    "agora-app-builder-cli": "1.0.5"
+  }
+}
