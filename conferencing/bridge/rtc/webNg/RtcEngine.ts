@@ -133,10 +133,10 @@ interface RemoteStream {
   audio?: IRemoteAudioTrack;
   video?: IRemoteVideoTrack;
 }
-AgoraRTC.setArea({
-  areaCode: AREAS.GLOBAL,
-  excludedArea: AREAS.CHINA,
-});
+// AgoraRTC.setArea({
+//   areaCode: AREAS.GLOBAL,
+//   excludedArea: AREAS.CHINA,
+// });
 
 export default class RtcEngine {
   public appId: string;
