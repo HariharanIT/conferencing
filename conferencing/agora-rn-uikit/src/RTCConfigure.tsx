@@ -343,7 +343,7 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
         //     AreaCode.GLOB ^ AreaCode.CN,
         //   );
         // } else {
-        engine.current = await RtcEngine.create(rtcProps.appId);
+          engine.current = await RtcEngine.create(rtcProps.appId);
         // }
         console.log(engine.current);
         if (rtcProps.profile) {
@@ -460,19 +460,20 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
         });
       }
       if (engine.current) {
-        if (uidState.max[0].video) {
+        if(uidState.max[0].video){
           await engine.current.muteLocalVideoStream(true);
         }
-
+        
         await engine.current.joinChannel(
           rtcProps.token || null,
           rtcProps.channel,
           null,
           rtcProps.uid || 0,
         );
-        if (uidState.max[0].video) {
+        if(uidState.max[0].video){
           await engine.current.muteLocalVideoStream(false);
         }
+
       } else {
         console.error('trying to join before RTC Engine was initialized');
       }

@@ -10,7 +10,8 @@
 *********************************************
 */
 import React, {useContext} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, Linking, Platform} from 'react-native';
+import Hyperlink from 'react-native-hyperlink';
 import ChatContext, {channelMessage} from '../components/ChatContext';
 import ColorContext from '../components/ColorContext';
 
@@ -19,6 +20,13 @@ const ChatBubble = (props: channelMessage) => {
   const {primaryColor} = useContext(ColorContext);
   let {isLocal, msg, ts, uid} = props;
   let time = new Date(ts).getHours() + ':' + new Date(ts).getMinutes();
+  const handleUrl = (url: string) => {
+    if(Platform.OS == 'web'){
+      window.open(url, '_blank');
+   } else {
+      Linking.openURL(url)
+   }
+  }
   return (
     <View>
       <View style={isLocal ? style.chatSenderViewLocal : style.chatSenderView}>
@@ -32,11 +40,20 @@ const ChatBubble = (props: channelMessage) => {
             ? [style.chatBubbleLocal, {backgroundColor: primaryColor}]
             : style.chatBubble
         }>
-        <Text
-          style={isLocal ? style.whiteText : style.blackText}
-          selectable={true}>
-          {msg.slice(1) + ' '}
-        </Text>
+        <Hyperlink
+          onPress={handleUrl}
+          linkStyle={{
+            color: !isLocal
+              ? $config.PRIMARY_FONT_COLOR
+              : $config.SECONDARY_FONT_COLOR,
+            textDecorationLine: 'underline',
+          }}>
+          <Text
+            style={isLocal ? style.whiteText : style.blackText}
+            selectable={true}>
+            {msg.slice(1) + ' '}
+          </Text>
+        </Hyperlink>
       </View>
     </View>
   );
@@ -76,7 +93,7 @@ const style = StyleSheet.create({
     textAlign: 'right',
   },
   chatBubble: {
-    backgroundColor: $config.PRIMARY_FONT_COLOR + '80',
+    backgroundColor: $config.PRIMARY_FONT_COLOR + '20',
     flex: 1,
     // width: 'max-content',
     maxWidth: '80%',
@@ -106,7 +123,7 @@ const style = StyleSheet.create({
   },
   blackText: {
     color: $config.PRIMARY_FONT_COLOR,
-    opacity: 0.9,
+    opacity: 1,
     fontWeight: '500',
   },
 });
