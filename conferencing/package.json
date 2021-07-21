@@ -1,6 +1,6 @@
 {
   "name": "conferencing",
-  "version": "1.0.0",
+  "version": "1.0.8",
   "private": true,
   "main": ".electron/index.js",
   "scripts": {
@@ -25,17 +25,9 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "icons:android": "react-native set-icon --path ./build/icon.png",
     "icons:ios": "react-native set-icon --path ./build/icon.png",
-    "package:mac": "npm run mac:build && electron-builder --publish=always",
-    "release": "electron-builder --mac --windows --linux --publish always --config ./electron-builder.js "
+    "release:mac": "electron-builder --mac --publish always --config electron-builder.js",
+    "release:windows": "cross-env gulp releaseWindows"
   },
-  "publish": [
-    {
-      "provider": "github",
-      "token": "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",
-      "owner": "AgoraIO-Community",
-      "repo": "app-builder-core"
-    }
-  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/AgoraIO-Community/app-builder-core"

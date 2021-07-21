@@ -33,10 +33,10 @@ module.exports = {
     publish: [
       {
         provider: "github",
-        owner: "AgoraIO-Community",
-        repo: "app-builder-core"
+        owner: "technophilic",
+        repo: "conferencing",
       }
-    ]  
+    ] ,
   },
   win: {
     target: [
@@ -45,6 +45,13 @@ module.exports = {
         arch: ['ia32'],
       },
     ],
+    publish: [
+      {
+        provider: "github",
+        owner: "technophilic",
+        repo: "conferencing",
+      }
+    ] ,
   },
   afterSign: './notarize.js',
   protocols: [
