@@ -87,7 +87,9 @@ app.on('second-instance', (event, argv, cwd) => {
     deeplinkingUrl = argv.slice(1)
   }
     logEverywhere('app.makeSingleInstance# ' + deeplinkingUrl)
-    mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
+    if(mainWindow){
+      mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
+    }
 
     // Someone tried to run a second instance, we should focus our window.
     if (mainWindow) {
@@ -221,7 +223,9 @@ app.on('will-finish-launching', function () {
     event.preventDefault()
     deeplinkingUrl = url
     logEverywhere('open-url# ' + deeplinkingUrl)
-    mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
+    if(mainWindow){
+      mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
+    }
   })
 })
 
