@@ -74,6 +74,35 @@ autoUpdater.on('update-downloaded', (info) => {
   showNotification();
 });
 
+let deeplinkingUrl;
+
+// Force Single Instance Application
+app.requestSingleInstanceLock();
+app.on('second-instance', (event, argv, cwd) => {
+
+  // Protocol handler for win32
+  // argv: An array of the second instance’s (command line / deep linked) arguments
+  if (process.platform == 'win32') {
+    // Keep only command line / deep linked arguments
+    deeplinkingUrl = argv.slice(1)
+  }
+    logEverywhere('app.makeSingleInstance# ' + deeplinkingUrl)
+    mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
+
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) {
+        mainWindow.restore();
+      }
+      mainWindow.focus();
+    }
+})
+// if (shouldQuit) {
+//   app.quit()
+//   return
+// }
+
+
 const createWindow = () => {
   const name = app.getName();
   const template = [
@@ -165,6 +194,15 @@ const createWindow = () => {
 
   // Open the DevTools.
   isDevelopment && mainWindow.webContents.openDevTools();
+
+  // Protocol handler for win32
+  if (process.platform == 'win32') {
+    // Keep only command line / deep linked arguments
+    deeplinkingUrl = process.argv.slice(1)
+    // mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
+  }
+  logEverywhere("createWindow# " + deeplinkingUrl)
+
   mainWindow.once('ready-to-show', () => {
     if (process.platform === 'win32' && isDevelopment) {
       mainWindow.reload();
@@ -173,48 +211,9 @@ const createWindow = () => {
   });
 };
 
-let deeplinkingUrl;
-// if (!app.isDefaultProtocolClient('myapp')) {
-//   // Define custom protocol handler. Deep linking works on packaged versions of the application!
-//   app.setAsDefaultProtocolClient(`${config.PRODUCT_ID.toLowerCase()}://my-host`);
-// }
-if (process.platform === 'win32') {
-  // Set the path of electron.exe and your app.
-  // These two additional parameters are only available on windows.
-  // Setting this is required to get this working in dev mode.
-  app.setAsDefaultProtocolClient(`${config.PRODUCT_ID.toLowerCase()}://my-host`, process.execPath, [
-    path.resolve(process.argv[1])
-  ]);
-} else {
-  app.setAsDefaultProtocolClient(`${config.PRODUCT_ID.toLowerCase()}://my-host`);
-}
-console.log(`${config.PRODUCT_ID.toLowerCase()}://my-host`)
-const gotTheLock = app.requestSingleInstanceLock();
-if (gotTheLock) {
-  app.on('second-instance', (e, argv) => {
+// Define custom protocol handler. Deep linking works on packaged versions of the application!
+app.setAsDefaultProtocolClient(`${config.PRODUCT_ID.toLowerCase()}://my-host`)
 
-    // Protocol handler for win32
-    // argv: An array of the second instance’s (command line / deep linked) arguments
-    if (process.platform === 'win32') {
-      // Keep only command line / deep linked arguments
-      deeplinkingUrl = argv.slice(1);
-    }
-    if (process.platform !== 'darwin') {
-      // Find the arg that is our custom protocol url and store it
-      deeplinkingUrl = argv.find((arg) => arg.startsWith(`${config.PRODUCT_ID.toLowerCase()}://my-host`));
-    }
-    logEverywhere('app.makeSingleInstance# ' + deeplinkingUrl)
-    mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
-
-    // Someone tried to run a second instance, we should focus our window.
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) {
-        mainWindow.restore();
-      }
-      mainWindow.focus();
-    }
-  });
-}
 
 app.on('will-finish-launching', function () {
   // Protocol handler for osx
