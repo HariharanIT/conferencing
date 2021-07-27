@@ -9,6 +9,8 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 const {format} = require('url');
 const port = 9002;
 
+const config = require('../../config.json');
+
 // isDevelopment && require('react-devtools-electron');
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -126,7 +128,7 @@ const createWindow = () => {
     mainWindow.loadURL(
       format({
         pathname: path.join(__dirname, 'index.html'),
-        protocol: 'file',
+        protocol: 'file:',
         slashes: true,
       }),
     );
@@ -145,23 +147,22 @@ const createWindow = () => {
 let deeplinkingUrl;
 // if (!app.isDefaultProtocolClient('myapp')) {
 //   // Define custom protocol handler. Deep linking works on packaged versions of the application!
-//   app.setAsDefaultProtocolClient('appbuilder');
+//   app.setAsDefaultProtocolClient(`${config.PRODUCT_ID.toLowerCase()}://my-host`);
 // }
 if (isDevelopment && process.platform === 'win32') {
   // Set the path of electron.exe and your app.
   // These two additional parameters are only available on windows.
   // Setting this is required to get this working in dev mode.
-  app.setAsDefaultProtocolClient('appbuilder', process.execPath, [
+  app.setAsDefaultProtocolClient(`${config.PRODUCT_ID.toLowerCase()}://my-host`, process.execPath, [
     path.resolve(process.argv[1])
   ]);
 } else {
-  app.setAsDefaultProtocolClient('appbuilder');
+  app.setAsDefaultProtocolClient(`${config.PRODUCT_ID.toLowerCase()}://my-host`);
 }
-
+console.log(`${config.PRODUCT_ID.toLowerCase()}://my-host`)
 const gotTheLock = app.requestSingleInstanceLock();
 if (gotTheLock) {
   app.on('second-instance', (e, argv) => {
-    // Someone tried to run a second instance, we should focus our window.
 
     // Protocol handler for win32
     // argv: An array of the second instance’s (command line / deep linked) arguments
@@ -169,8 +170,14 @@ if (gotTheLock) {
       // Keep only command line / deep linked arguments
       deeplinkingUrl = argv.slice(1)
     }
+    // if (process.platform !== 'darwin') {
+    //   // Find the arg that is our custom protocol url and store it
+    //   deeplinkingUrl = argv.find((arg) => arg.startsWith('appbuilder://'));
+    // }
     logEverywhere('app.makeSingleInstance# ' + deeplinkingUrl)
+    mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
 
+    // Someone tried to run a second instance, we should focus our window.
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore()
       mainWindow.focus()
@@ -184,6 +191,7 @@ app.on('will-finish-launching', function() {
     event.preventDefault()
     deeplinkingUrl = url
     logEverywhere('open-url# ' + deeplinkingUrl)
+    mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
   })
 })
 

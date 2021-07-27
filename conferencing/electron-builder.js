@@ -56,9 +56,9 @@ module.exports = {
   afterSign: './notarize.js',
   protocols: [
     {
-      name: "appbuilder",
+      name: `${$config.PRODUCT_ID.toLowerCase()}-electron-deep-linking`,
       schemes: [
-        "appbuilder"
+        `${$config.PRODUCT_ID.toLowerCase()}://my-host`
       ]
     }
   ]

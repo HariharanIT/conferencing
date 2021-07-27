@@ -9,9 +9,38 @@
  information visit https://appbuilder.agora.io. 
 *********************************************
 */
-import React from 'react';
+import React, {useEffect} from 'react';
+import {ipcRenderer} from "electron";
+import { useHistory } from "react-router-dom";
+
+const processUrl = (url: string): string => {
+  return url
+    .replace(`${$config.PRODUCT_ID.toLowerCase()}://my-host//`, '')
+    .replace($config.FRONTEND_ENDPOINT, '');
+};
 
 const Navigation = () => {
+  const history = useHistory();
+  useEffect( () => {
+    const deepLink = (link: string) => {
+      console.log('Deep-linking url: ', decodeURIComponent(link));
+      if (link !== null) {
+        const processedUrl = processUrl(decodeURIComponent(link));
+        console.log('Processed-url', processedUrl)
+        history.push(`/${processedUrl}`);
+      }
+    };
+
+    ipcRenderer.on('ping', (event: any, message: string) => { 
+        console.log(message, 'something') 
+        // let route = message.split('//')[1];
+        // console.log(history, route)
+        // history.push(`/${route}`);
+        deepLink(message);
+    });
+
+}, []);
+
   return <></>;
 };
 
