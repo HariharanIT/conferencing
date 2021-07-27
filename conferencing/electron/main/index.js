@@ -20,9 +20,13 @@ autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 log.info('App starting...');
 
-const intr = setInterval(() => {
-  autoUpdater.checkForUpdates();
-}, 30000);
+const intr = (() => {
+  if(!isDevelopment){
+    setInterval(() => {
+      autoUpdater.checkForUpdates();
+    }, 30000)
+  }
+})();
 
 let mainWindow;
 
@@ -174,7 +178,7 @@ let deeplinkingUrl;
 //   // Define custom protocol handler. Deep linking works on packaged versions of the application!
 //   app.setAsDefaultProtocolClient(`${config.PRODUCT_ID.toLowerCase()}://my-host`);
 // }
-if (isDevelopment && process.platform === 'win32') {
+if (process.platform === 'win32') {
   // Set the path of electron.exe and your app.
   // These two additional parameters are only available on windows.
   // Setting this is required to get this working in dev mode.
@@ -191,14 +195,14 @@ if (gotTheLock) {
 
     // Protocol handler for win32
     // argv: An array of the second instance’s (command line / deep linked) arguments
-    if (process.platform == 'win32') {
+    if (process.platform === 'win32') {
       // Keep only command line / deep linked arguments
       deeplinkingUrl = argv.slice(1);
     }
-    // if (process.platform !== 'darwin') {
-    //   // Find the arg that is our custom protocol url and store it
-    //   deeplinkingUrl = argv.find((arg) => arg.startsWith('appbuilder://'));
-    // }
+    if (process.platform !== 'darwin') {
+      // Find the arg that is our custom protocol url and store it
+      deeplinkingUrl = argv.find((arg) => arg.startsWith(`${config.PRODUCT_ID.toLowerCase()}://my-host`));
+    }
     logEverywhere('app.makeSingleInstance# ' + deeplinkingUrl)
     mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
 
