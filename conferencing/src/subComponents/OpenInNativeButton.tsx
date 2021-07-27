@@ -14,21 +14,43 @@ import {View, TouchableOpacity, Text, Platform, StyleSheet} from 'react-native';
 import ColorContext from '../components/ColorContext';
 
 /**
- * A component to open the meeting using a native application.
+ * A component to open the meeting inside the native application.
  * This component will be rendered only on web
  * WIP. Need to implement deeplinks on native apps.
  */
+
+ function isElectron() {
+  // Renderer process
+  if (typeof window !== 'undefined' && typeof window.process === 'object' && window.process.type === 'renderer') {
+      return true;
+  }
+
+  // Main process
+  if (typeof process !== 'undefined' && typeof process.versions === 'object' && !!process.versions.electron) {
+      return true;
+  }
+
+  // Detect the user agent when the `nodeIntegration` option is set to true
+  if (typeof navigator === 'object' && typeof navigator.userAgent === 'string' && navigator.userAgent.indexOf('Electron') >= 0) {
+      return true;
+  }
+
+  return false;
+}
 const OpenInNativeButton = () => {
   const {primaryColor} = useContext(ColorContext);
-  const openInNative = () => {};
+  const openInNative = () => {
+    window.open(`${$config.PRODUCT_ID.toLowerCase()}://my-host//join`)
+  };
 
-  return Platform.OS === 'web' ? (
+  return Platform.OS === 'web' && !isElectron()? (
     <View style={{position: 'absolute', right: 0}}>
       <TouchableOpacity
         style={[style.btn, {borderColor: primaryColor}]}
         onPress={() => openInNative()}>
         <Text style={[style.btnText, {color: $config.PRIMARY_FONT_COLOR}]}>Open in Desktop</Text>
       </TouchableOpacity>
+      <a href={`${$config.PRODUCT_ID.toLowerCase()}://my-host//join`}>open </a>
     </View>
   ) : (
     <></>

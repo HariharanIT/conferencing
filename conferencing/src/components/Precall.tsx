@@ -25,7 +25,7 @@ import {LocalAudioMute, LocalVideoMute} from '../../agora-rn-uikit/Components';
 import LocalUserContext from '../../agora-rn-uikit/src/LocalUserContext';
 import SelectDevice from '../subComponents/SelectDevice';
 import Logo from '../subComponents/Logo';
-// import OpenInNativeButton from '../subComponents/OpenInNativeButton';
+import OpenInNativeButton from '../subComponents/OpenInNativeButton';
 import ColorContext from './ColorContext';
 // import {useHistory} from './Router';
 // import {precallCard} from '../../theme.json';
@@ -52,7 +52,7 @@ const Precall = (props: any) => {
       <View style={style.nav}>
         <Logo />
         {error ? <Error error={error} showBack={true} /> : <></>}
-        {/* <OpenInNativeButton /> */}
+        <OpenInNativeButton />
       </View>
       <View style={style.content}>
         <View style={style.leftContent}>
