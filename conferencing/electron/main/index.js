@@ -212,7 +212,7 @@ const createWindow = () => {
 };
 
 // Define custom protocol handler. Deep linking works on packaged versions of the application!
-app.setAsDefaultProtocolClient(`${config.PRODUCT_ID.toLowerCase()}://my-host`)
+app.setAsDefaultProtocolClient(`${config.PRODUCT_ID.toLowerCase()}`)
 
 
 app.on('will-finish-launching', function () {

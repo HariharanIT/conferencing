@@ -15,7 +15,7 @@ import { useHistory } from "react-router-dom";
 
 const processUrl = (url: string): string => {
   return url
-    .replace(`${$config.PRODUCT_ID.toLowerCase()}://my-host//`, '')
+    .replace(`${$config.PRODUCT_ID.toLowerCase()}://`, '')
     .replace($config.FRONTEND_ENDPOINT, '');
 };
 
