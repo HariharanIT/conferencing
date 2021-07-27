@@ -12,6 +12,7 @@
 import React, {useContext} from 'react';
 import {View, TouchableOpacity, Text, Platform, StyleSheet} from 'react-native';
 import ColorContext from '../components/ColorContext';
+import { useParams } from '../components/Router';
 
 /**
  * A component to open the meeting inside the native application.
@@ -39,8 +40,11 @@ import ColorContext from '../components/ColorContext';
 }
 const OpenInNativeButton = () => {
   const {primaryColor} = useContext(ColorContext);
+  const params = useParams();
   const openInNative = () => {
-    window.open(`${$config.PRODUCT_ID.toLowerCase()}://my-host//join`)
+    const {phrase} = params;
+    console.log('Meeting-ID', phrase)
+    window.open(`${$config.PRODUCT_ID.toLowerCase()}://my-host//${phrase}`)
   };
 
   return Platform.OS === 'web' && !isElectron()? (
@@ -50,7 +54,6 @@ const OpenInNativeButton = () => {
         onPress={() => openInNative()}>
         <Text style={[style.btnText, {color: $config.PRIMARY_FONT_COLOR}]}>Open in Desktop</Text>
       </TouchableOpacity>
-      <a href={`${$config.PRODUCT_ID.toLowerCase()}://my-host//join`}>open </a>
     </View>
   ) : (
     <></>
