@@ -196,8 +196,7 @@ const createWindow = () => {
 
   // Open the DevTools.
   // isDevelopment && mainWindow.webContents.openDevTools();
-  mainWindow.webContents.openDevTools();
-  
+    
   // Protocol handler for win32
   if (process.platform == 'win32') {
     // Keep only command line / deep linked arguments
