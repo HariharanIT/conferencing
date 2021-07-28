@@ -87,9 +87,9 @@ app.on('second-instance', (event, argv, cwd) => {
     deeplinkingUrl = argv.slice(1)
   }
     logEverywhere('app.makeSingleInstance# ' + deeplinkingUrl)
-    if(mainWindow){
+    // if(mainWindow){
       mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
-    }
+    // }
 
     // Someone tried to run a second instance, we should focus our window.
     if (mainWindow) {
@@ -195,21 +195,42 @@ const createWindow = () => {
   }
 
   // Open the DevTools.
-  isDevelopment && mainWindow.webContents.openDevTools();
-
+  // isDevelopment && mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
+  
   // Protocol handler for win32
   if (process.platform == 'win32') {
     // Keep only command line / deep linked arguments
     deeplinkingUrl = process.argv.slice(1)
+    console.log('platform', process.platform)
     // mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
   }
   logEverywhere("createWindow# " + deeplinkingUrl)
-
+  mainWindow.webContents.on('did-finish-load', () => {
+    if(deeplinkingUrl){
+      mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
+    }
+  }) 
   mainWindow.once('ready-to-show', () => {
     if (process.platform === 'win32' && isDevelopment) {
       mainWindow.reload();
     }
     mainWindow.show();
+  });
+
+  // Set a variable when the app is quitting.
+  let isAppQuitting = false;
+  if(process.platform === 'darwin'){
+    app.on('before-quit', function (evt) {
+      isAppQuitting = true;
+    });
+  }
+  // on OSX, we don't want to quit the app on close, hide the app modal.
+  mainWindow.on('close', function (evt) {
+      if (!isAppQuitting) {
+          evt.preventDefault();
+          mainWindow.hide();
+      }
   });
 };
 
@@ -257,9 +278,10 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
+  // if (BrowserWindow.getAllWindows().length === 0) {
+  //   createWindow();
+  // }
+  mainWindow.show();
 });
 
 // In this file you can include the rest of your app's specific main process
