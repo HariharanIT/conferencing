@@ -12,7 +12,7 @@
 const {PRODUCT_ID} = require('./config.json');
 module.exports = {
   appId: `com.${PRODUCT_ID.toLowerCase()}`,
-  productName: PRODUCT_ID,
+  productName: PRODUCT_ID.toLocaleLowerCase(),
   directories: {
     output: './out',
     app: './.electron',

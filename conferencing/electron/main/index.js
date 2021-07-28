@@ -77,33 +77,28 @@ autoUpdater.on('update-downloaded', (info) => {
 let deeplinkingUrl;
 
 // Force Single Instance Application
-const gotTheLock = app.requestSingleInstanceLock();
-if(gotTheLock){
-  app.on('second-instance', (event, argv, cwd) => {
-  
-    // Protocol handler for win32
-    // argv: An array of the second instance’s (command line / deep linked) arguments
-    if (process.platform == 'win32') {
-      // Keep only command line / deep linked arguments
-      deeplinkingUrl = argv.slice(1)
-    }
-      logEverywhere('app.makeSingleInstance# ' + deeplinkingUrl)
-      // if(mainWindow){
-        mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
-      // }
-  
-      // Someone tried to run a second instance, we should focus our window.
-      if (mainWindow) {
-        if (mainWindow.isMinimized()) {
-          mainWindow.restore();
-        }
-        mainWindow.focus();
+app.requestSingleInstanceLock();
+app.on('second-instance', (event, argv, cwd) => {
+
+  // Protocol handler for win32
+  // argv: An array of the second instance’s (command line / deep linked) arguments
+  if (process.platform == 'win32') {
+    // Keep only command line / deep linked arguments
+    deeplinkingUrl = argv.slice(1)
+  }
+    logEverywhere('app.makeSingleInstance# ' + deeplinkingUrl)
+    // if(mainWindow){
+      mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
+    // }
+
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) {
+        mainWindow.restore();
       }
-  })
-}else{
-  app.quit();
-  return
-}
+      mainWindow.focus();
+    }
+})
 // if (shouldQuit) {
 //   app.quit()
 //   return
@@ -201,7 +196,7 @@ const createWindow = () => {
 
   // Open the DevTools.
   // isDevelopment && mainWindow.webContents.openDevTools();
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
   // Protocol handler for win32
   if (process.platform == 'win32') {
