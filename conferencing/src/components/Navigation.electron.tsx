@@ -25,6 +25,10 @@ const Navigation = () => {
     const deepLink = (link: string) => {
       console.log('Deep-linking url: ', decodeURIComponent(link));
       if (link !== null) {
+        // needed for mac electron build, because we are launching the existing instance of the APP, 
+        // thus reload to reset the existing state
+        history.go(0)
+        
         const processedUrl = processUrl(decodeURIComponent(link));
         console.log('Processed-url:', processedUrl)
         history.push(`/${processedUrl}`);
