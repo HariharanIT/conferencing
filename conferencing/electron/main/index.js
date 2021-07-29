@@ -199,7 +199,7 @@ else{
   
     // Open the DevTools.
     // isDevelopment && mainWindow.webContents.openDevTools();
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
   
     // Protocol handler for win32
     if (process.platform == 'win32') {
@@ -257,7 +257,7 @@ else{
       logEverywhere('open-url# ' + deeplinkingUrl)
       if(mainWindow){
         mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
-        window.show();
+        mainWindow.show();
       }
     })
   })
