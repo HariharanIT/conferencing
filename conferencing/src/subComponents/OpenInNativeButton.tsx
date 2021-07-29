@@ -52,7 +52,7 @@ const OpenInNativeButton = () => {
       <TouchableOpacity
         style={[style.btn, {borderColor: primaryColor}]}
         onPress={() => openInNative()}>
-        <Text style={[style.btnText, {color: $config.PRIMARY_FONT_COLOR}]}>Open in Desktop</Text>
+        <Text style={[style.btnText, {color: $config.SECONDARY_FONT_COLOR}]}>Open in Desktop</Text>
       </TouchableOpacity>
     </View>
   ) : (
@@ -63,15 +63,11 @@ const OpenInNativeButton = () => {
 const style = StyleSheet.create({
   btn: {
     backgroundColor: $config.PRIMARY_COLOR,
-    // width: 110,
     flex: 1,
     paddingHorizontal: 10,
     height: 30,
-    // borderWidth: 1,
-    // borderColor: $config.PRIMARY_COLOR,
+    marginBottom: 20, //required because of the Agora Logo
     borderRadius: 100,
-    // marginTop: 5,
-    // marginRight: 10,
   },
   btnText: {
     fontSize: 12,
