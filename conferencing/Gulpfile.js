@@ -122,4 +122,10 @@ module.exports.build = series(
   build,
 );
 
+function releaseWindows(cb){
+  runCli('electron-builder --windows --publish always --config ./electron-builder.js', cb);
+}
+
 module.exports.development = series(clean, directory , electronDevServer, mainDev, start);
+
+module.exports.releaseWindows = releaseWindows;
