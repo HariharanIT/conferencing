@@ -12,7 +12,7 @@
 const {PRODUCT_ID} = require('./config.json');
 module.exports = {
   appId: `com.${PRODUCT_ID.toLowerCase()}`,
-  productName: PRODUCT_ID,
+  productName: PRODUCT_ID.toLocaleLowerCase(),
   directories: {
     output: './out',
     app: './.electron',
@@ -28,7 +28,10 @@ module.exports = {
     entitlementsInherit: './electron/entitlements.mac.plist',
     extendInfo: {
       "NSMicrophoneUsageDescription": "Mic access",
-      "NSCameraUsageDescription": "Camera access"
+      "NSCameraUsageDescription": "Camera access",
+      "CFBundleTypeRole": "Editor",
+			"CFBundleURLName": "conferencing",
+			"CFBundleURLSchemes": ['conferencing']
     },
     publish: [
       {
@@ -58,7 +61,7 @@ module.exports = {
     {
       name: `${PRODUCT_ID.toLowerCase()}-electron-deep-linking`,
       schemes: [
-        `${PRODUCT_ID.toLowerCase()}://my-host`
+        `${PRODUCT_ID.toLowerCase()}`
       ]
     }
   ]

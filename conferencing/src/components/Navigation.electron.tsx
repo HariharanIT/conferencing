@@ -25,18 +25,24 @@ const Navigation = () => {
     const deepLink = (link: string) => {
       console.log('Deep-linking url: ', decodeURIComponent(link));
       if (link !== null) {
+        // needed for mac electron build, because we are launching the existing instance of the APP, 
+        // thus reload to reset the existing state
+        history.go(0)
+        
         const processedUrl = processUrl(decodeURIComponent(link));
-        console.log('Processed-url', processedUrl)
+        console.log('Processed-url:', processedUrl)
         history.push(`/${processedUrl}`);
       }
     };
 
     ipcRenderer.on('ping', (event: any, message: string) => { 
-        console.log(message, 'something') 
+        console.log('Ipc message, ping for deep link url:', message) 
         // let route = message.split('//')[1];
         // console.log(history, route)
         // history.push(`/${route}`);
-        deepLink(message);
+        if(message){
+          deepLink(message);
+        }
     });
 
 }, []);

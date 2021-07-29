@@ -44,7 +44,8 @@ const OpenInNativeButton = () => {
   const openInNative = () => {
     const {phrase} = params;
     console.log('Meeting-ID', phrase)
-    window.open(`${$config.PRODUCT_ID.toLowerCase()}://my-host//${phrase}`)
+    // we avoid the extra colon here, because it gets skipped by open-url in electron
+    window.open(`${$config.PRODUCT_ID.toLowerCase()}://${phrase}`)
   };
 
   return Platform.OS === 'web' && !isElectron()? (
