@@ -64,7 +64,7 @@ const style = StyleSheet.create({
     flex: 1,
   },
   chatSenderViewLocal: {
-    flex: 2,
+    // flex: 2,
     marginVertical: 2,
     flexDirection: 'row',
     marginRight: 15,
@@ -72,7 +72,7 @@ const style = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   chatSenderView: {
-    flex: 2,
+    // flex: 2,
     marginVertical: 2,
     flexDirection: 'row',
     marginRight: 30,
