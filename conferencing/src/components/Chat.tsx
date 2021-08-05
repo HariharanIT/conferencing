@@ -363,6 +363,7 @@ const style = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
     padding: 10,
+    marginTop: 3,
     borderBottomWidth: 1,
     borderBottomColor: $config.PRIMARY_FONT_COLOR
   },
