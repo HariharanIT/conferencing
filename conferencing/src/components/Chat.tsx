@@ -201,21 +201,21 @@ const Chat = (props: any) => {
                                 userId: user.uid,
                                 lastSeenCount: privateMessageCountMap[user.uid],
                               });
-                            }}>
+                            }}
+                            >
                             {(privateMessageCountMap[user.uid] || 0) -
                               (lastCheckedPrivateState[user.uid] || 0) !==
                             0 ? (
-                              <View style={style.chatNotification}>
+                              <View style={style.chatNotificationPrivate}>
                                 {(privateMessageCountMap[user.uid] || 0) -
                                   (lastCheckedPrivateState[user.uid] || 0)}
                               </View>
                             ) : null}
                             <Text style={style.participantText}>
                               {userList[user.uid]
-                                ? userList[user.uid].name + ' '
-                                : 'User '}
+                                ? `> ${userList[user.uid].name}  `
+                                : '> User '}
                             </Text>
-                            <Text style={{color: $config.PRIMARY_FONT_COLOR}}>{`>`}</Text>
                           </TouchableOpacity>
                         );
                       }
@@ -356,16 +356,15 @@ const style = StyleSheet.create({
     color: $config.PRIMARY_FONT_COLOR + 50,
   },
   participantContainer: {
-    flexDirection: 'row',
-    // flex: 1,
-    height: 20,
-    marginTop: 10,
+    flexDirection: 'column',
     backgroundColor: $config.SECONDARY_FONT_COLOR,
-    // height: '15%',
-    width: '90%',
+    width: '100%',
     alignSelf: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: $config.PRIMARY_FONT_COLOR
   },
   participantText: {
     flex: 1,
@@ -374,8 +373,6 @@ const style = StyleSheet.create({
     flexDirection: 'row',
     color: $config.PRIMARY_FONT_COLOR,
     lineHeight: 20,
-    paddingLeft: 10,
-    alignSelf: 'center',
   },
   backButton: {
     // marginLeft: 5,
@@ -403,6 +400,20 @@ const style = StyleSheet.create({
     position: 'absolute',
     left: 25,
     top: -5,
+  },
+  chatNotificationPrivate:{
+    width: 18,
+    height: 18,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: $config.PRIMARY_COLOR,
+    color: $config.SECONDARY_FONT_COLOR,
+    fontFamily: Platform.OS === 'ios' ? 'Helvetica' : 'sans-serif',
+    borderRadius: 9,
+    position: 'absolute',
+    left: 10,
+    top: 0,
   },
 });
 
