@@ -29,6 +29,7 @@ import ColorContext from './ColorContext';
 import FallbackLogo from '../subComponents/FallbackLogo';
 import Layout from '../subComponents/LayoutEnum';
 import RtcContext, {DispatchType} from '../../agora-rn-uikit/src/RtcContext';
+import {useEffect} from 'react';
 
 const layout = (len: number, isDesktop: boolean = true) => {
   const rows = Math.round(Math.sqrt(len));
@@ -55,7 +56,8 @@ interface GridVideoProps {
 }
 
 const GridVideo = (props: GridVideoProps) => {
-  const {dispatch} = useContext(RtcContext);
+  const {dispatch, activeSpeakers} = useContext(RtcContext);
+  const rtc = useContext(RtcContext);
   const max = useContext(MaxUidContext);
   const min = useContext(MinUidContext);
   const {primaryColor} = useContext(ColorContext);
@@ -74,6 +76,22 @@ const GridVideo = (props: GridVideoProps) => {
     () => layout(users.length, isDesktop),
     [users.length, isDesktop],
   );
+  console.log(
+    {thisisMyactivespeaker: activeSpeakers},
+    {users},
+    {userList},
+    {matrix},
+  );
+  const isActiveSpeaker = (id: string | number) => {
+    const activeSpeakerId = activeSpeakers[0];
+    if (activeSpeakerId === undefined) return false;
+    if (id === 'local' || id === '1') {
+      // checking if the local user is the active speaker
+      return localUid === `${activeSpeakerId}`;
+    }
+    // for remote users
+    return id === activeSpeakerId;
+  };
   return (
     <View
       style={[style.full, {paddingHorizontal: isDesktop ? 50 : 0}]}
@@ -96,12 +114,23 @@ const GridVideo = (props: GridVideoProps) => {
                 marginHorizontal: 'auto',
               }}
               key={cidx}>
-              <View style={style.gridVideoContainerInner}>
+              <View
+                style={[
+                  {
+                    ...(isActiveSpeaker(users[ridx * dims.c + cidx].uid) && {
+                      borderColor: primaryColor,
+                      borderWidth: 4,
+                    }),
+                  },
+                  style.gridVideoContainerInner,
+                ]}>
                 <MaxVideoView
                   fallback={() => {
                     if (users[ridx * dims.c + cidx].uid === 'local') {
                       return FallbackLogo(userList[localUid]?.name);
-                    } else if (String(users[ridx * dims.c + cidx].uid)[0] === '1') {
+                    } else if (
+                      String(users[ridx * dims.c + cidx].uid)[0] === '1'
+                    ) {
                       return FallbackLogo('PSTN User');
                     } else {
                       return FallbackLogo(
@@ -163,14 +192,15 @@ const GridVideo = (props: GridVideoProps) => {
                         ? userList[localUid].name.slice(0, 20) + ' '
                         : 'You '
                       : userList[users[ridx * dims.c + cidx].uid]
-                        ? userList[users[ridx * dims.c + cidx].uid].name.slice(
+                      ? userList[users[ridx * dims.c + cidx].uid].name.slice(
                           0,
                           20,
                         ) + ' '
-                        : users[ridx * dims.c + cidx].uid === 1
-                          ? (userList[localUid]?.name + "'s screen ").slice(0, 20)
-                          : String(users[ridx * dims.c + cidx].uid)[0] === '1' ?
-                            'PSTN User ' : 'User '}
+                      : users[ridx * dims.c + cidx].uid === 1
+                      ? (userList[localUid]?.name + "'s screen ").slice(0, 20)
+                      : String(users[ridx * dims.c + cidx].uid)[0] === '1'
+                      ? 'PSTN User '
+                      : 'User '}
                   </Text>
                   {/* </View> */}
                   {/* {console.log(
@@ -203,7 +233,7 @@ const style = StyleSheet.create({
   },
   gridVideoContainerInner: {
     // borderColor: '#fff',
-    // borderWidth:2,
+    // borderWidth: 5,
     // width: '100%',
     borderRadius: 15,
     flex: 1,

@@ -143,6 +143,7 @@ export default class RtcEngine {
   // public AgoraRTC: any;
   public client: IAgoraRTCClient;
   public screenClient: IAgoraRTCClient;
+
   public eventsMap = new Map<string, callbackType>([
     ['UserJoined', () => null],
     ['UserOffline', () => null],
@@ -150,6 +151,7 @@ export default class RtcEngine {
     ['ScreenshareStopped', () => null],
     ['RemoteAudioStateChanged', () => null],
     ['RemoteVideoStateChanged', () => null],
+    ['ActiveSpeaker', () => null],
   ]);
   public localStream: LocalStream = {};
   public screenStream: ScreenStream = {};
@@ -240,6 +242,11 @@ export default class RtcEngine {
     // });
     // await enable;
   }
+  async enableAudioVolumeIndication(interval, smooth, isLocal) {
+    console.log({enableAudioState: interval});
+    this.client.enableAudioVolumeIndicator();
+    return;
+  }
   async publish() {
     if (this.localStream.audio && this.localStream.video) {
       try {
@@ -287,6 +294,7 @@ export default class RtcEngine {
           : 1
         : user.uid;
       (this.eventsMap.get('UserJoined') as callbackType)(uid);
+      // (this.eventsMap.get('ActiveSpeaker') as callbackType)(uid);
       (this.eventsMap.get('RemoteVideoStateChanged') as callbackType)(
         uid,
         0,
@@ -387,9 +395,30 @@ export default class RtcEngine {
     });
 
     // this.client.on('stream-fallback', (evt))
+
+    this.client.on('volume-indicator', (volumes) => {
+      const highestvolumeObj = volumes.reduce(
+        (highestVolume, volume, index) => {
+          if (highestVolume === null) {
+            return volume;
+          } else {
+            if (volume.level > highestVolume.level) {
+              return volume;
+            }
+            return highestVolume;
+          }
+          // console.log(`${index} UID ${volume.uid} Level ${volume.level}`);
+        },
+        null,
+      );
+      const activeSpeaker = highestvolumeObj ? highestvolumeObj.uid : undefined;
+      (this.eventsMap.get('ActiveSpeaker') as callbackType)(activeSpeaker);
+    });
+
     this.client.on('stream-type-changed', function (uid, streamType) {
       console.log('[fallback]: ', uid, streamType);
     });
+
     await this.client.join(
       this.appId,
       channelName,
@@ -419,7 +448,8 @@ export default class RtcEngine {
       event === 'JoinChannelSuccess' ||
       event === 'ScreenshareStopped' ||
       event === 'RemoteAudioStateChanged' ||
-      event === 'RemoteVideoStateChanged'
+      event === 'RemoteVideoStateChanged' ||
+      event === 'ActiveSpeaker'
     ) {
       this.eventsMap.set(event, listener as callbackType);
     }

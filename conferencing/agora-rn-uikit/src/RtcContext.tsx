@@ -13,11 +13,12 @@ export interface UidInterface {
 export interface UidStateInterface {
   min: Array<UidInterface>;
   max: Array<UidInterface>;
+  activeSpeakers: Array<number>;
 }
 
 export interface ActionInterface<
   T extends keyof CallbacksInterface,
-  K extends CallbacksInterface
+  K extends CallbacksInterface,
 > {
   type: T;
   value: Parameters<K[T]>;
@@ -36,6 +37,7 @@ export interface RtcContextInterface {
   RtcEngine: RtcEngine;
   dispatch: DispatchType<keyof CallbacksInterface>;
   setDualStreamMode: React.Dispatch<React.SetStateAction<DualStreamMode>>;
+  activeSpeakers: Array<number>;
 }
 
 const RtcContext = React.createContext<RtcContextInterface>(

@@ -40,6 +40,7 @@ const initialState: UidStateInterface = {
       streamType: 'high',
     },
   ],
+  activeSpeakers: [],
 };
 
 const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
@@ -257,6 +258,11 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
           max: state.max.map(videoChange),
         };
         break;
+      case 'ActiveSpeakerDetected':
+        return {
+          ...state,
+          activeSpeakers: action.value,
+        };
     }
 
     // Handle event listeners
@@ -343,7 +349,7 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
         //     AreaCode.GLOB ^ AreaCode.CN,
         //   );
         // } else {
-          engine.current = await RtcEngine.create(rtcProps.appId);
+        engine.current = await RtcEngine.create(rtcProps.appId);
         // }
         console.log(engine.current);
         if (rtcProps.profile) {
@@ -358,6 +364,7 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
             });
           }
         }
+        await engine.current.enableAudioVolumeIndication(200, 3, true);
         try {
           await engine.current.enableVideo();
         } catch (e) {
@@ -393,6 +400,22 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
             type: 'UserJoined',
             value: args,
           });
+        });
+
+        engine.current.addListener('ActiveSpeaker', (...args) => {
+          if (Platform.OS === 'web') {
+            // used as a callback from the web bridge
+            (dispatch as DispatchType<'ActiveSpeakerDetected'>)({
+              type: 'ActiveSpeakerDetected',
+              value: args,
+            });
+          } else {
+            // for mobile needs to be tested
+            (dispatch as DispatchType<'ActiveSpeakerDetected'>)({
+              type: 'ActiveSpeakerDetected',
+              value: args,
+            });
+          }
         });
 
         engine.current.addListener('UserOffline', (...args) => {
@@ -460,20 +483,19 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
         });
       }
       if (engine.current) {
-        if(uidState.max[0].video){
+        if (uidState.max[0].video) {
           await engine.current.muteLocalVideoStream(true);
         }
-        
+
         await engine.current.joinChannel(
           rtcProps.token || null,
           rtcProps.channel,
           null,
           rtcProps.uid || 0,
         );
-        if(uidState.max[0].video){
+        if (uidState.max[0].video) {
           await engine.current.muteLocalVideoStream(false);
         }
-
       } else {
         console.error('trying to join before RTC Engine was initialized');
       }
@@ -500,6 +522,7 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
         RtcEngine: engine.current as RtcEngine,
         dispatch,
         setDualStreamMode,
+        activeSpeakers: uidState.activeSpeakers,
       }}>
       <MaxUidProvider value={uidState.max}>
         <MinUidProvider value={uidState.min}>
