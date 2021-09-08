@@ -164,7 +164,9 @@ const GridVideo = (props: GridVideoProps) => {
                   <View style={[style.MicBackdrop]}>
                     <Image
                       source={{
-                        uri: users[ridx * dims.c + cidx].audio
+                        uri: isActiveSpeaker(users[ridx * dims.c + cidx].uid)
+                          ? icons.speaker
+                          : users[ridx * dims.c + cidx].audio
                           ? icons.mic
                           : icons.micOff,
                       }}
