@@ -120,6 +120,9 @@ const GridVideo = (props: GridVideoProps) => {
                     ...(isActiveSpeaker(users[ridx * dims.c + cidx].uid) && {
                       borderColor: primaryColor,
                       borderWidth: 4,
+                      padding: 0,
+                      marginLeft: 10,
+                      marginRight: 10,
                     }),
                   },
                   style.gridVideoContainerInner,
@@ -173,7 +176,7 @@ const GridVideo = (props: GridVideoProps) => {
                             : 'red',
                         },
                       ]}
-                      resizeMode={'contain'}
+                      resizeMode="contain"
                     />
                   </View>
                   <Text
