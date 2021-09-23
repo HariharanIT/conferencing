@@ -137,7 +137,7 @@ interface RemoteStream {
 //   areaCode: AREAS.GLOBAL,
 //   excludedArea: AREAS.CHINA,
 // });
-
+AgoraRTC.setLogLevel(0);
 AgoraRTC.enableLogUpload();
 
 export default class RtcEngine {
