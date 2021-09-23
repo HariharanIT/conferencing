@@ -138,6 +138,8 @@ interface RemoteStream {
 //   excludedArea: AREAS.CHINA,
 // });
 
+AgoraRTC.enableLogUpload();
+
 export default class RtcEngine {
   public appId: string;
   // public AgoraRTC: any;
