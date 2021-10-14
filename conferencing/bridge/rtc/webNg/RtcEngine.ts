@@ -222,7 +222,7 @@ export default class RtcEngine {
     try {
       let [localAudio, localVideo] =
         await AgoraRTC.createMicrophoneAndCameraTracks(
-          {},
+          {bypassWebAudio : true},
           {encoderConfig: this.videoProfile},
         );
       // localVideo.setEncoderConfiguration(this.videoProfile);
