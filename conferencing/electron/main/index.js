@@ -10,6 +10,10 @@ const port = 9002;
 
 const config = require('../../config.json');
 
+// The notification 'Update ready for download' is triggered every interval,
+// The following flag switches to true, after it is shown once
+let hasUpdateNotificationBeenShown = false;
+
 // isDevelopment && require('react-devtools-electron');
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -20,23 +24,21 @@ log.info('App starting...');
 
 let mainWindow;
 
-
 let deeplinkingUrl;
 
 // Force Single Instance Application
 let gotTheLock = app.requestSingleInstanceLock();
 // logEverywhere('#got the lock ' + deeplinkingUrl)
-if(!gotTheLock){
+if (!gotTheLock) {
   app.quit();
-}
-else{
+} else {
   autoUpdater.logger = log;
   autoUpdater.logger.transports.file.level = 'info';
   const intr = (() => {
-    if(!isDevelopment){
+    if (!isDevelopment) {
       setInterval(() => {
         autoUpdater.checkForUpdates();
-      }, 30000)
+      }, 30000);
     }
   })();
 
@@ -71,42 +73,47 @@ else{
   autoUpdater.on('update-downloaded', (info) => {
     sendStatusToWindow('Update downloaded');
     // autoUpdater.quitAndInstall();
-  
+
     const NOTIFICATION_TITLE = 'An update is ready';
     const NOTIFICATION_BODY = 'Please restart your app to complete the update';
-  
+
     function showNotification() {
       new Notification({
         title: NOTIFICATION_TITLE,
         body: NOTIFICATION_BODY,
       }).show();
     }
-    showNotification();
-  });  
+    if (!hasUpdateNotificationBeenShown) {
+      showNotification();
+    }
+    // Set the flag to true after notification is shown once
+    hasUpdateNotificationBeenShown = true;
+  });
   app.on('second-instance', (event, argv, cwd) => {
-  
     // Protocol handler for win32
     // argv: An array of the second instance’s (command line / deep linked) arguments
     if (process.platform !== 'darwin') {
       // Keep only command line / deep linked arguments
       // deeplinkingUrl = argv.slice(2)
-      deeplinkingUrl = argv.find((arg) => arg.startsWith(`${config.PRODUCT_ID.toLowerCase()}`));
+      deeplinkingUrl = argv.find((arg) =>
+        arg.startsWith(`${config.PRODUCT_ID.toLowerCase()}`),
+      );
     }
-      logEverywhere('app.makeSingleInstance# ' + deeplinkingUrl)
-      logEverywhere('#got the lock ' + gotTheLock)
-      
-      // if(mainWindow){
-        mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
-      // }
-  
-      // Someone tried to run a second instance, we should focus our window.
-      if (mainWindow) {
-        if (mainWindow.isMinimized()) {
-          mainWindow.restore();
-        }
-        mainWindow.focus();
+    logEverywhere('app.makeSingleInstance# ' + deeplinkingUrl);
+    logEverywhere('#got the lock ' + gotTheLock);
+
+    // if(mainWindow){
+    mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl));
+    // }
+
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) {
+        mainWindow.restore();
       }
-  })
+      mainWindow.focus();
+    }
+  });
 
   const createWindow = () => {
     const name = app.getName();
@@ -148,13 +155,15 @@ else{
     autoUpdater.checkForUpdatesAndNotify();
     const menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
-  
+
     // Create the browser window.
-    session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
-      details.requestHeaders['User-Agent'] = 'Chrome';
-      callback({cancel: false, requestHeaders: details.requestHeaders});
-    });
-  
+    session.defaultSession.webRequest.onBeforeSendHeaders(
+      (details, callback) => {
+        details.requestHeaders['User-Agent'] = 'Chrome';
+        callback({cancel: false, requestHeaders: details.requestHeaders});
+      },
+    );
+
     mainWindow = new BrowserWindow({
       width: 1280,
       height: 720,
@@ -164,7 +173,7 @@ else{
       },
       show: false,
     });
-  
+
     mainWindow.webContents.on(
       'new-window',
       (event, url, frameName, disposition, options, additionalFeatures) => {
@@ -181,10 +190,10 @@ else{
         }
       },
     );
-  
+
     // and load the index.html of the app.
     // mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-  
+
     if (isDevelopment) {
       mainWindow.loadURL(`http://localhost:${port}`);
     } else {
@@ -196,72 +205,71 @@ else{
         }),
       );
     }
-  
+
     // Open the DevTools.
     // isDevelopment && mainWindow.webContents.openDevTools();
     // mainWindow.webContents.openDevTools();
-  
+
     // Protocol handler for win32
     if (process.platform == 'win32') {
       // Keep only command line / deep linked arguments
-      deeplinkingUrl = process.argv.slice(1)
-      console.log('platform', process.platform)
+      deeplinkingUrl = process.argv.slice(1);
+      console.log('platform', process.platform);
       // mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
     }
-    logEverywhere("createWindow# " + deeplinkingUrl)
-    logEverywhere('#got the lock ' + gotTheLock)
+    logEverywhere('createWindow# ' + deeplinkingUrl);
+    logEverywhere('#got the lock ' + gotTheLock);
     // if(process.platform === 'darwin'){
-        mainWindow.webContents.on('did-finish-load', () => {
-          if(deeplinkingUrl){
-            mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
-          }
-      })
-    // } 
+    mainWindow.webContents.on('did-finish-load', () => {
+      if (deeplinkingUrl) {
+        mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl));
+      }
+    });
+    // }
     mainWindow.once('ready-to-show', () => {
       if (process.platform === 'win32' && isDevelopment) {
         // mainWindow.reload();
       }
       mainWindow.show();
     });
-  
+
     // Set a variable when the app is quitting.
     let isAppQuitting = false;
-    if(process.platform === 'darwin'){
+    if (process.platform === 'darwin') {
       app.on('before-quit', function (evt) {
         isAppQuitting = true;
       });
     }
     // on OSX, we don't want to quit the app on close, hide the app modal.
     mainWindow.on('close', function (evt) {
-        if (!isAppQuitting && process.platform === 'darwin') {
-            evt.preventDefault();
-            mainWindow.hide();
-        }
-        if(process.platform !== 'darwin'){
-          // mainWindow.close();
-          mainWindow = null;
-          app.quit();
-        }
+      if (!isAppQuitting && process.platform === 'darwin') {
+        evt.preventDefault();
+        mainWindow.hide();
+      }
+      if (process.platform !== 'darwin') {
+        // mainWindow.close();
+        mainWindow = null;
+        app.quit();
+      }
     });
   };
-  
+
   // Define custom protocol handler. Deep linking works on packaged versions of the application!
-  app.setAsDefaultProtocolClient(`${config.PRODUCT_ID.toLowerCase()}`)
-  
-  
+  app.setAsDefaultProtocolClient(`${config.PRODUCT_ID.toLowerCase()}`);
+
   app.on('will-finish-launching', function () {
     // Protocol handler for osx
-    app.on('open-url', function(event, url) {
-      event.preventDefault()
-      deeplinkingUrl = url
-      logEverywhere('open-url# ' + deeplinkingUrl)
-      if(mainWindow){
-        mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl))
+    app.on('open-url', function (event, url) {
+      event.preventDefault();
+      deeplinkingUrl = url;
+      logEverywhere('open-url# ' + deeplinkingUrl);
+      if (mainWindow) {
+        mainWindow.webContents.send('ping', encodeURIComponent(deeplinkingUrl));
         mainWindow.show();
       }
-    })
-  })
-  
+    });
+  });
+
   // Log both at dev console and at running node console instance
   function logEverywhere(s) {
     console.log(s);
@@ -269,14 +277,14 @@ else{
       mainWindow.webContents.executeJavaScript(`console.log("${s}")`);
     }
   }
-  
+
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   app.on('ready', () => {
     createWindow();
   });
-  
+
   // Quit when all windows are closed, except on macOS. There, it's common
   // for applications and their menu bar to stay active until the user quits
   // explicitly with Cmd + Q.
@@ -286,7 +294,7 @@ else{
     }
     clearInterval(intr);
   });
-  
+
   app.on('activate', () => {
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
@@ -295,10 +303,7 @@ else{
     // }
     mainWindow.show();
   });
-  
+
   // In this file you can include the rest of your app's specific main process
   // code. You can also put them in separate files and import them here.
-  
 }
-
-
