@@ -9,9 +9,10 @@
  information visit https://appbuilder.agora.io. 
 *********************************************
 */
-import {Platform} from 'react-native';
+import {Platform,StyleSheet} from 'react-native';
 
-const styles = {
+//Added stylesheet component for type checking and style validation
+const styles = StyleSheet.create({
   temp: {
     width: '100%',
     height: '100%',
@@ -75,6 +76,14 @@ const styles = {
     right: 5,
     top: 5,
   },
-};
+  screenSharingMessageContainer:{
+    flex:1,
+    justifyContent:'center',
+    backgroundColor:'transparent'
+  },
+  screensharingMessage:{
+    alignSelf:'center',fontSize: 20
+  }
+});
 
 export default styles;

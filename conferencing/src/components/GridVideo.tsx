@@ -96,7 +96,16 @@ const GridVideo = (props: GridVideoProps) => {
                 marginHorizontal: 'auto',
               }}
               key={cidx}>
-              <View style={style.gridVideoContainerInner}>
+              {
+                users[ridx * dims.c + cidx].uid === 1 
+                ?
+                  <View style={styles.screenSharingMessageContainer}>
+                      <Text style={styles.screensharingMessage}>
+                        Screen sharing is active now. 
+                      </Text>
+                  </View>
+                :
+                <View style={style.gridVideoContainerInner}>
                 <MaxVideoView
                   fallback={() => {
                     if (users[ridx * dims.c + cidx].uid === 'local') {
@@ -181,7 +190,7 @@ const GridVideo = (props: GridVideoProps) => {
                     users[ridx * dims.c + cidx].uid,
                   )} */}
                 </View>
-              </View>
+              </View>}
             </Pressable>
           ))}
         </View>

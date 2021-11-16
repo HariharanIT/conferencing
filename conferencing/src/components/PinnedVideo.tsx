@@ -28,6 +28,7 @@ import ColorContext from './ColorContext';
 import icons from '../assets/icons';
 import {layoutProps} from '../../theme.json';
 import FallbackLogo from '../subComponents/FallbackLogo';
+import styles from './styles';
 
 const {topPinned} = layoutProps;
 
@@ -47,7 +48,7 @@ const PinnedVideo = () => {
     }, 20);
   };
   const isSidePinnedlayout = topPinned === true ? false : dim[2]; // if either explicity set to false or auto evaluation
-  const {userList, localUid} = useContext(chatContext);
+  const {userList, localUid} = useContext(chatContext);  
   return (
     <View
       style={{
@@ -193,6 +194,14 @@ const PinnedVideo = () => {
         }>
         <MaxUidConsumer>
           {(maxUsers) => (
+            maxUsers[0].uid === 1 
+            ?
+              <View style={styles.screenSharingMessageContainer}>
+                <Text style={styles.screensharingMessage}>
+                  Screen sharing is active now. 
+                </Text>
+              </View>
+            :
             <View style={style.flex1}>
               <MaxVideoView
                 fallback={() => {
