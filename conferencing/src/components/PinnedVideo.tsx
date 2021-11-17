@@ -29,6 +29,7 @@ import icons from '../assets/icons';
 import {layoutProps} from '../../theme.json';
 import FallbackLogo from '../subComponents/FallbackLogo';
 import styles from './styles';
+import ScreenShareNotice from '../subComponents/ScreenShareNotice';
 
 const {topPinned} = layoutProps;
 
@@ -194,14 +195,8 @@ const PinnedVideo = () => {
         }>
         <MaxUidConsumer>
           {(maxUsers) => (
-            maxUsers[0].uid === 1 
-            ?
-              <View style={styles.screenSharingMessageContainer}>
-                <Text style={styles.screensharingMessage}>
-                  Screen sharing is active now. 
-                </Text>
-              </View>
-            :
+            <>
+            <ScreenShareNotice uid={maxUsers[0].uid} />
             <View style={style.flex1}>
               <MaxVideoView
                 fallback={() => {
@@ -244,6 +239,7 @@ const PinnedVideo = () => {
                 </Text>
               </View>
             </View>
+            </>
           )}
         </MaxUidConsumer>
       </View>

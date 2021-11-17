@@ -29,6 +29,7 @@ import ColorContext from './ColorContext';
 import FallbackLogo from '../subComponents/FallbackLogo';
 import Layout from '../subComponents/LayoutEnum';
 import RtcContext, {DispatchType} from '../../agora-rn-uikit/src/RtcContext';
+import ScreenShareNotice from '../subComponents/ScreenShareNotice';
 
 const layout = (len: number, isDesktop: boolean = true) => {
   const rows = Math.round(Math.sqrt(len));
@@ -96,15 +97,7 @@ const GridVideo = (props: GridVideoProps) => {
                 marginHorizontal: 'auto',
               }}
               key={cidx}>
-              {
-                users[ridx * dims.c + cidx].uid === 1 
-                ?
-                  <View style={styles.screenSharingMessageContainer}>
-                      <Text style={styles.screensharingMessage}>
-                        Screen sharing is active now. 
-                      </Text>
-                  </View>
-                :
+                <ScreenShareNotice uid={users[ridx * dims.c + cidx].uid} />
                 <View style={style.gridVideoContainerInner}>
                 <MaxVideoView
                   fallback={() => {
@@ -190,7 +183,7 @@ const GridVideo = (props: GridVideoProps) => {
                     users[ridx * dims.c + cidx].uid,
                   )} */}
                 </View>
-              </View>}
+              </View>
             </Pressable>
           ))}
         </View>

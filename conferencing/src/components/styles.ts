@@ -74,14 +74,6 @@ const styles = {
     position: 'absolute',
     right: 5,
     top: 5,
-  },
-  screenSharingMessageContainer:{
-    flex:1,
-    justifyContent:'center',
-    backgroundColor:'transparent'
-  },
-  screensharingMessage:{
-    alignSelf:'center',fontSize: 20
   }
 };
 
